@@ -16,7 +16,7 @@ GO111MODULE=on go get -u github.com/raviqqe/rnm
 ## Usage
 
 ```
-rnm FooBar FooBar
+rnm FooBar BazQux
 ```
 
 For more information, see `rnm --help`.
