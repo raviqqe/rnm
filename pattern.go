@@ -1,4 +1,4 @@
-package rename
+package main
 
 import "regexp"
 

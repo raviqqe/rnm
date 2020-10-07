@@ -1,4 +1,4 @@
-package rename
+package main
 
 import (
 	"regexp"
@@ -6,13 +6,11 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-// Renamer renames all identifiers similar to a given identifier.
-type Renamer struct {
+type renamer struct {
 	patterns []pattern
 }
 
-// New creates a renamer.
-func New(from string, to string) (*Renamer, error) {
+func newRenamer(from string, to string) (*renamer, error) {
 	ps := []pattern{}
 
 	for _, f := range [](func(string) string){strcase.ToCamel} {
@@ -24,11 +22,10 @@ func New(from string, to string) (*Renamer, error) {
 		ps = append(ps, pattern{r, f(to)})
 	}
 
-	return &Renamer{ps}, nil
+	return &renamer{ps}, nil
 }
 
-// Rename renames all identifiers in a string.
-func (r *Renamer) Rename(s string) string {
+func (r *renamer) Rename(s string) string {
 	for _, p := range r.patterns {
 		s = p.From.ReplaceAllLiteralString(s, p.To)
 	}

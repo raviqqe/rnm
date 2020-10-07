@@ -10,7 +10,6 @@ import (
 
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/mattn/go-zglob"
-	"github.com/raviqqe/rnm/rename"
 )
 
 func main() {
@@ -26,7 +25,7 @@ func run() error {
 		return errors.New("Usage: rnm <from> <to>")
 	}
 
-	r, err := rename.New(os.Args[1], os.Args[2])
+	r, err := newRenamer(os.Args[1], os.Args[2])
 	if err != nil {
 		return err
 	}
@@ -90,7 +89,7 @@ func validateFilename(s string) (bool, error) {
 	return !ok, nil
 }
 
-func renameFile(r *rename.Renamer, path string) error {
+func renameFile(r *renamer, path string) error {
 	p := r.Rename(path)
 
 	if p != path {
