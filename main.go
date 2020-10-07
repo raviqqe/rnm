@@ -21,11 +21,12 @@ func main() {
 }
 
 func run() error {
-	if len(os.Args[1:]) != 2 {
-		return errors.New("Usage: rnm <from> <to>")
+	args, err := getArguments()
+	if err != nil {
+		return err
 	}
 
-	r, err := newRenamer(os.Args[1], os.Args[2])
+	r, err := newRenamer(args.Patterns.From, args.Patterns.To)
 	if err != nil {
 		return err
 	}
