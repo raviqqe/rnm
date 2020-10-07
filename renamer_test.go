@@ -27,6 +27,20 @@ func TestRenameDifferentCases(t *testing.T) {
 	}
 }
 
+func TestDoNotRenameDifferentCases(t *testing.T) {
+	r, err := newRenamer("foo", "bar")
+	assert.Nil(t, err)
+
+	for _, s := range []string{
+		"ffoo",
+		"fooo",
+		"FFOO",
+		"FOOO",
+	} {
+		assert.Equal(t, s, r.Rename(s))
+	}
+}
+
 func TestRenameAcronym(t *testing.T) {
 	r, err := newRenamer("u s a", "u k")
 	assert.Nil(t, err)
