@@ -14,14 +14,14 @@ import (
 )
 
 func main() {
-	err := command()
+	err := run()
 	if err != nil {
 		printError(err)
 		os.Exit(1)
 	}
 }
 
-func command() error {
+func run() error {
 	if len(os.Args[1:]) != 2 {
 		return errors.New("Usage: rnm <from> <to>")
 	}
@@ -39,17 +39,6 @@ func command() error {
 	g := &sync.WaitGroup{}
 	ec := make(chan error, 1024)
 	ok := true
-
-	g.Add(1)
-	go func() {
-		defer g.Done()
-
-		for err := range ec {
-			ok = false
-
-			printError(err)
-		}
-	}()
 
 	for _, s := range ss {
 		g.Add(1)
@@ -72,7 +61,17 @@ func command() error {
 		}(s)
 	}
 
-	g.Wait()
+	go func() {
+		g.Wait()
+
+		close(ec)
+	}()
+
+	for err := range ec {
+		ok = false
+
+		printError(err)
+	}
 
 	if !ok {
 		return errors.New("failed to rename some identifiers")
@@ -82,7 +81,7 @@ func command() error {
 }
 
 func validateFilename(s string) (bool, error) {
-	ok, err := regexp.MatchString("^\\.|/\\.", s)
+	ok, err := regexp.MatchString("(^|/)\\.", s)
 
 	if err != nil {
 		return false, err
