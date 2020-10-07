@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"sync"
 
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/mattn/go-zglob"
 	"github.com/raviqqe/rnm/rename"
 )
@@ -14,7 +16,7 @@ import (
 func main() {
 	err := command()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		printError(err)
 		os.Exit(1)
 	}
 }
@@ -36,13 +38,34 @@ func command() error {
 
 	g := &sync.WaitGroup{}
 	ec := make(chan error, 1024)
+	ok := true
+
+	g.Add(1)
+	go func() {
+		defer g.Done()
+
+		for err := range ec {
+			ok = false
+
+			printError(err)
+		}
+	}()
 
 	for _, s := range ss {
 		g.Add(1)
 		go func(s string) {
 			defer g.Done()
 
-			err := renameFile(r, s)
+			ok, err := validateFilename(s)
+			if err != nil {
+				ec <- err
+			}
+
+			if !ok {
+				return
+			}
+
+			err = renameFile(r, s)
 			if err != nil {
 				ec <- err
 			}
@@ -51,14 +74,6 @@ func command() error {
 
 	g.Wait()
 
-	ok := false
-
-	for err := range ec {
-		ok = true
-
-		fmt.Fprintln(os.Stderr, err)
-	}
-
 	if !ok {
 		return errors.New("failed to rename some identifiers")
 	}
@@ -66,12 +81,24 @@ func command() error {
 	return nil
 }
 
+func validateFilename(s string) (bool, error) {
+	ok, err := regexp.MatchString("^\\.|/\\.", s)
+
+	if err != nil {
+		return false, err
+	}
+
+	return !ok, nil
+}
+
 func renameFile(r *rename.Renamer, path string) error {
 	p := r.Rename(path)
 
-	err := os.Rename(path, p)
-	if err != nil {
-		return err
+	if p != path {
+		err := os.Rename(path, p)
+		if err != nil {
+			return err
+		}
 	}
 
 	i, err := os.Lstat(p)
@@ -87,4 +114,8 @@ func renameFile(r *rename.Renamer, path string) error {
 	}
 
 	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+}
+
+func printError(err error) {
+	fmt.Fprintln(os.Stderr, aurora.Red(err))
 }
