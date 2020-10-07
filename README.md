@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/raviqqe/rnm?style=flat-square)](https://goreportcard.com/report/github.com/raviqqe/rnm)
 [![License](https://img.shields.io/github/license/raviqqe/rnm.svg?style=flat-square)](LICENSE)
 
-Rename any names in your code!
+Rename all names in your code!
 
 ## Install
 
