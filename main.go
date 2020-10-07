@@ -38,7 +38,6 @@ func run() error {
 
 	g := &sync.WaitGroup{}
 	ec := make(chan error, 1024)
-	ok := true
 
 	for _, s := range ss {
 		g.Add(1)
@@ -67,6 +66,8 @@ func run() error {
 		close(ec)
 	}()
 
+	ok := true
+
 	for err := range ec {
 		ok = false
 
@@ -82,7 +83,6 @@ func run() error {
 
 func validateFilename(s string) (bool, error) {
 	ok, err := regexp.MatchString("(^|/)\\.", s)
-
 	if err != nil {
 		return false, err
 	}
