@@ -14,6 +14,15 @@ func newRenamer(from string, to string) (*renamer, error) {
 	ps := []pattern{}
 
 	for _, f := range [](func(string) string){
+		func(s string) string {
+			return s
+		},
+		func(s string) string {
+			return strcase.ToDelimited(s, ' ')
+		},
+		func(s string) string {
+			return strcase.ToScreamingDelimited(s, ' ', 0, true)
+		},
 		strcase.ToCamel,
 		strcase.ToKebab,
 		strcase.ToLowerCamel,

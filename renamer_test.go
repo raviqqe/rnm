@@ -20,6 +20,8 @@ func TestRenameDifferentCases(t *testing.T) {
 		{"FOO_BAR", "BAZ_QUX"},
 		{"fooBar", "bazQux"},
 		{"FooBar", "BazQux"},
+		{"foo bar", "baz qux"},
+		{"FOO BAR", "BAZ QUX"},
 	} {
 		assert.Equal(t, ss[1], r.Rename(ss[0]))
 	}

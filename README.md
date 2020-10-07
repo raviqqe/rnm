@@ -21,6 +21,32 @@ rnm FooBar BazQux
 
 For more information, see `rnm --help`.
 
+## Examples
+
+Given a file named `foo.ts`:
+
+```typescript
+const FOO_BAR: number = 42;
+
+export class FooBar {
+  public fooBar() {
+    console.log("foo bar");
+  }
+}
+```
+
+When you run `rnm FooBar BazQux`, you would see the file with contents:
+
+```typescript
+const BAZ_QUX: number = 42;
+
+export class BazQux {
+  public bazQux() {
+    console.log("baz qux");
+  }
+}
+```
+
 ## License
 
 [MIT](LICENSE)
