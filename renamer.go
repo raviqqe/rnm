@@ -13,7 +13,14 @@ type renamer struct {
 func newRenamer(from string, to string) (*renamer, error) {
 	ps := []pattern{}
 
-	for _, f := range [](func(string) string){strcase.ToCamel} {
+	for _, f := range [](func(string) string){
+		strcase.ToCamel,
+		strcase.ToKebab,
+		strcase.ToLowerCamel,
+		strcase.ToScreamingKebab,
+		strcase.ToScreamingSnake,
+		strcase.ToSnake,
+	} {
 		r, err := regexp.Compile(f(from))
 		if err != nil {
 			return nil, err
