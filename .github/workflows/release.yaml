@@ -1,8 +1,8 @@
 name: release
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - master
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -11,11 +11,21 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v2
-        with:
-          go-version: 1.15
-      - uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release --rm-dist
+      - run: |
+          version=v$(go run . --version)
+
+          if git tag -l | grep $version; then
+            exit
+          fi
+
+          git config --global user.name "$GIT_USER"
+          git config --global user.email "$GIT_EMAIL"
+
+          git tag $version
+          git push --tags
+
+          curl -sL https://git.io/goreleaser | bash
         env:
+          GIT_USER: ${{ secrets.GIT_USER }}
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
