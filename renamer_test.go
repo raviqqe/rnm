@@ -22,6 +22,7 @@ func TestRenameDifferentCases(t *testing.T) {
 		{"FooBar", "BazQux"},
 		{"foo bar", "baz qux"},
 		{"FOO BAR", "BAZ QUX"},
+		{"AfooBar", "AfooBar"},
 	} {
 		assert.Equal(t, ss[1], r.Rename(ss[0]))
 	}
@@ -53,13 +54,6 @@ func TestRenameAcronym(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "UK", r.Rename("USA"))
-}
-
-func TestDoNotRenameLowerCamelWithAlphabetHead(t *testing.T) {
-	r, err := newRenamer("foo bar", "bar baz")
-	assert.Nil(t, err)
-
-	assert.Equal(t, "AfooBar", r.Rename("AfooBar"))
 }
 
 func TestRenameNameInText(t *testing.T) {
