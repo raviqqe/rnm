@@ -9,7 +9,7 @@ const (
 )
 
 func compileDelimiter(d delimiter, head bool) string {
-	s := "[[:^alpha:]]"
+	s := "[^[:alpha:]]"
 
 	switch d {
 	case upperCase:
