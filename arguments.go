@@ -13,8 +13,8 @@ type arguments struct {
 		To   string
 	} `positional-args:"true"`
 	RawCaseNames []caseName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
-	Help         bool          `short:"h" long:"help" description:"Show this help"`
-	Version      bool          `long:"version" description:"Show version"`
+	Help         bool       `short:"h" long:"help" description:"Show this help"`
+	Version      bool       `long:"version" description:"Show version"`
 	CaseNames    map[caseName]struct{}
 }
 
