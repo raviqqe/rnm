@@ -7,11 +7,11 @@ import (
 )
 
 type renamer struct {
-	patterns []pattern
+	patterns []compiledPattern
 }
 
 func newRenamer(from string, to string) (*renamer, error) {
-	ps := []pattern{}
+	ps := []compiledPattern{}
 
 	for _, f := range [](func(string) string){
 		func(s string) string {
@@ -32,7 +32,7 @@ func newRenamer(from string, to string) (*renamer, error) {
 			return nil, err
 		}
 
-		ps = append(ps, pattern{r, f(to)})
+		ps = append(ps, compiledPattern{r, f(to)})
 	}
 
 	return &renamer{ps}, nil

@@ -2,7 +2,7 @@ package main
 
 import "regexp"
 
-type pattern struct {
+type compiledPattern struct {
 	From *regexp.Regexp
 	To   string
 }
