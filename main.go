@@ -117,11 +117,10 @@ func renameFile(r *renamer, path string) error {
 		return err
 	}
 
-	ok, err := regexp.MatchString("octet-stream", http.DetectContentType(bs))
-
+	ok, err := regexp.MatchString("^text/", http.DetectContentType(bs))
 	if err != nil {
 		return err
-	} else if ok {
+	} else if !ok {
 		return nil
 	}
 
