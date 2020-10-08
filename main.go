@@ -49,18 +49,9 @@ func run() error {
 			sm.Request()
 			defer sm.Release()
 
-			ok, err := validateFilename(s)
-			if err != nil {
-				ec <- err
-			}
-
-			if !ok {
-				return
-			}
-
 			err = renameFile(r, s)
 			if err != nil {
-				ec <- err
+				ec <- fmt.Errorf("%v: %v", s, err)
 			}
 		}(s)
 	}
@@ -86,16 +77,14 @@ func run() error {
 	return nil
 }
 
-func validateFilename(s string) (bool, error) {
-	ok, err := regexp.MatchString("(^|/)\\.", s)
+func renameFile(r *renamer, path string) error {
+	ok, err := validatePath(path)
 	if err != nil {
-		return false, err
+		return err
+	} else if !ok {
+		return nil
 	}
 
-	return !ok, nil
-}
-
-func renameFile(r *renamer, path string) error {
 	p := r.Rename(path)
 
 	if p != path {
@@ -112,7 +101,7 @@ func renameFile(r *renamer, path string) error {
 		return nil
 	}
 
-	ok, err := isTextFile(p)
+	ok, err = isTextFile(p)
 	if err != nil {
 		return err
 	} else if !ok {
@@ -125,6 +114,15 @@ func renameFile(r *renamer, path string) error {
 	}
 
 	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+}
+
+func validatePath(s string) (bool, error) {
+	ok, err := regexp.MatchString("(^|/)\\.", s)
+	if err != nil {
+		return false, err
+	}
+
+	return !ok, nil
 }
 
 func isTextFile(path string) (bool, error) {
