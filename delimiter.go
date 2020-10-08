@@ -13,9 +13,9 @@ func compileDelimiter(d delimiter, head bool) string {
 
 	switch d {
 	case upperCase:
-		s = "[[:upper:]]"
+		s = "(?:[[:upper:]]|" + s + ")"
 	case lowerCase:
-		s = "[[:lower:]]"
+		s = "(?:[[:lower:]]|" + s + ")"
 	}
 
 	return compilePosition(s, head)
