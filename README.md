@@ -34,7 +34,7 @@ export class FooBar {
 }
 ```
 
-When you run `rnm FooBar BazQux`, you would see the file with contents:
+When you run `rnm 'foo bar' 'baz qux'`, you would see the file with contents:
 
 ```typescript
 const BAZ_QUX: number = 42;
