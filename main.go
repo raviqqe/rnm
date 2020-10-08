@@ -38,12 +38,16 @@ func run() error {
 	}
 
 	g := &sync.WaitGroup{}
-	ec := make(chan error, 1024)
+	sm := newSemaphore(maxOpenFiles)
+	ec := make(chan error, errorChannelCapacity)
 
 	for _, s := range ss {
 		g.Add(1)
 		go func(s string) {
 			defer g.Done()
+
+			sm.Request()
+			defer sm.Release()
 
 			ok, err := validateFilename(s)
 			if err != nil {
