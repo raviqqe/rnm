@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -133,7 +134,7 @@ func isTextFile(path string) (bool, error) {
 
 	bs := make([]byte, 512)
 	_, err = f.Read(bs)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return false, err
 	}
 
