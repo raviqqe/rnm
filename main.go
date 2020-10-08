@@ -112,19 +112,39 @@ func renameFile(r *renamer, path string) error {
 		return nil
 	}
 
-	bs, err := ioutil.ReadFile(p)
-	if err != nil {
-		return err
-	}
-
-	ok, err := regexp.MatchString("^text/", http.DetectContentType(bs))
+	ok, err := isTextFile(p)
 	if err != nil {
 		return err
 	} else if !ok {
 		return nil
 	}
 
+	bs, err := ioutil.ReadFile(p)
+	if err != nil {
+		return err
+	}
+
 	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+}
+
+func isTextFile(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+
+	bs := make([]byte, 512)
+	_, err = f.Read(bs)
+	if err != nil {
+		return false, err
+	}
+
+	ok, err := regexp.MatchString("^text/", http.DetectContentType(bs))
+	if err != nil {
+		return false, err
+	}
+
+	return ok, nil
 }
 
 func printError(err error) {
