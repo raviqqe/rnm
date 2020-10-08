@@ -18,13 +18,13 @@ Replace all occurrences of a name to another name in your code!
 
 ## Install
 
-```
+```sh
 GO111MODULE=on go get -u github.com/raviqqe/rnm
 ```
 
 ## Usage
 
-```
+```sh
 rnm 'foo bar' 'baz qux'
 ```
 
