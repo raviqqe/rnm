@@ -10,10 +10,10 @@ Replace the same name to another name in your code!
 
 ## Features
 
-- Massive speed
-- Automatic pluralization
 - Support for different case styles
   - See `rnm --help` to list them all.
+- Automatic pluralization
+- Massive speed
 
 ## Install
 
