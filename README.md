@@ -24,25 +24,29 @@ For more information, see `rnm --help`.
 
 Given a file named `foo.ts`:
 
-```typescript
-const FOO_BAR: number = 42;
+```go
+const FOO_BAR = 42;
 
-export class FooBar {
-  public fooBar() {
-    console.log("foo bar");
-  }
+type FooBar {
+  fooBar int
+}
+
+func (f FooBar) fooBar() {
+  println("foo bar")
 }
 ```
 
 When you run `rnm 'foo bar' 'baz qux'`, you would see the file with contents:
 
-```typescript
-const BAZ_QUX: number = 42;
+```go
+const BAZ_QUX = 42;
 
-export class BazQux {
-  public bazQux() {
-    console.log("baz qux");
-  }
+type BazQux {
+  bazQux int
+}
+
+func (f BazQux) bazQux() {
+  println("baz qux")
 }
 ```
 
