@@ -4,14 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
 
 type arguments struct {
-	RawCaseNames []caseName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
-	Help         bool       `short:"h" long:"help" description:"Show this help"`
-	Version      bool       `long:"version" description:"Show version"`
+	RawCaseNames string `long:"enable" description:"Comma-separated names of enabled cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	Help         bool   `short:"h" long:"help" description:"Show this help"`
+	Version      bool   `long:"version" description:"Show version"`
 	From         string
 	To           string
 	CaseNames    map[caseName]struct{}
@@ -36,10 +37,16 @@ func getArguments() (*arguments, error) {
 
 	args.From, args.To = ss[0], ss[1]
 
-	if args.RawCaseNames != nil {
+	if args.RawCaseNames != "" {
 		args.CaseNames = map[caseName]struct{}{}
 
-		for _, n := range args.RawCaseNames {
+		for _, n := range strings.Split(args.RawCaseNames, ",") {
+			n := caseName(n)
+
+			if _, ok := allCaseNames[n]; !ok {
+				return nil, fmt.Errorf("invalid case name: %v", n)
+			}
+
 			args.CaseNames[n] = struct{}{}
 		}
 	}
