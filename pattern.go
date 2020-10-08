@@ -6,7 +6,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-type patternOptions struct {
+type caseConfig struct {
 	name    caseName
 	convert func(string) string
 	head    delimiter
@@ -18,7 +18,7 @@ type pattern struct {
 	To   string
 }
 
-var patternOptionsList = []*patternOptions{
+var caseConfigs = []*caseConfig{
 	{
 		camel,
 		strcase.ToLowerCamel,
@@ -74,11 +74,11 @@ var patternOptionsList = []*patternOptions{
 }
 
 func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
-	ps := make([]*pattern, 0, len(patternOptionsList))
+	ps := make([]*pattern, 0, len(caseConfigs))
 
-	for _, o := range patternOptionsList {
-		if _, ok := enabled[o.name]; ok {
-			p, err := compilePattern(from, to, o)
+	for _, m := range caseConfigs {
+		if _, ok := enabled[m.name]; ok {
+			p, err := compilePattern(from, to, m)
 			if err != nil {
 				return nil, err
 			}
@@ -90,7 +90,7 @@ func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*
 	return ps, nil
 }
 
-func compilePattern(from string, to string, o *patternOptions) (*pattern, error) {
+func compilePattern(from string, to string, o *caseConfig) (*pattern, error) {
 	r, err := regexp.Compile(
 		compileDelimiter(o.head, true) +
 			o.convert(from) +
