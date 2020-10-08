@@ -6,7 +6,7 @@ type renamer struct {
 
 func newRenamer(from string, to string, enabled map[caseName]struct{}) (*renamer, error) {
 	if enabled == nil {
-		enabled = allPatternNames
+		enabled = allCaseNames
 	}
 
 	ps, err := compilePatterns(from, to, enabled)

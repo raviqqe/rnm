@@ -13,7 +13,7 @@ const (
 	upperSpace caseName = "upper-space"
 )
 
-var allPatternNames = map[caseName]struct{}{
+var allCaseNames = map[caseName]struct{}{
 	camel:      {},
 	upperCamel: {},
 	kebab:      {},
