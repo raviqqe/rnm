@@ -22,7 +22,7 @@ For more information, see `rnm --help`.
 
 ## Examples
 
-Given a file named `foo.ts`:
+Given a file named `foo_bar.go`:
 
 ```go
 const FOO_BAR = 42;
@@ -36,7 +36,7 @@ func (f FooBar) fooBar() {
 }
 ```
 
-When you run `rnm 'foo bar' 'baz qux'`, you would see the file with contents:
+When you run `rnm 'foo bar' 'baz qux'`, you would see a file named `baz_qux.go` with contents:
 
 ```go
 const BAZ_QUX = 42;
