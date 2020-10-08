@@ -132,6 +132,7 @@ func isTextFile(path string) (bool, error) {
 		return false, err
 	}
 
+	// Read only 512 bytes for file type detection.
 	bs := make([]byte, 512)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
