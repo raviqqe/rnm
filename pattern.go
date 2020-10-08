@@ -26,15 +26,15 @@ func compilePatterns(from string, to string, cs map[caseName]struct{}) ([]*patte
 	return ps, nil
 }
 
-func compilePattern(from string, to string, o *caseConfiguration) (*pattern, error) {
+func compilePattern(from string, to string, c *caseConfiguration) (*pattern, error) {
 	r, err := regexp.Compile(
-		compileDelimiter(o.head, true) +
-			o.convert(from) +
-			compileDelimiter(o.tail, false),
+		compileDelimiter(c.head, true) +
+			c.convert(from) +
+			compileDelimiter(c.tail, false),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pattern{r, "${1}" + o.convert(to) + "${2}"}, nil
+	return &pattern{r, "${1}" + c.convert(to) + "${2}"}, nil
 }
