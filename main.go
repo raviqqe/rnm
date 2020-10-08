@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -27,7 +28,7 @@ func run() error {
 		return err
 	}
 
-	r, err := newRenamer(args.Patterns.From, args.Patterns.To, args.CaseNames)
+	r, err := newRenamer(args.From, args.To, args.CaseNames)
 	if err != nil {
 		return err
 	}
@@ -38,25 +39,20 @@ func run() error {
 	}
 
 	g := &sync.WaitGroup{}
-	ec := make(chan error, 1024)
+	sm := newSemaphore(maxOpenFiles)
+	ec := make(chan error, errorChannelCapacity)
 
 	for _, s := range ss {
 		g.Add(1)
 		go func(s string) {
 			defer g.Done()
 
-			ok, err := validateFilename(s)
-			if err != nil {
-				ec <- err
-			}
-
-			if !ok {
-				return
-			}
+			sm.Request()
+			defer sm.Release()
 
 			err = renameFile(r, s)
 			if err != nil {
-				ec <- err
+				ec <- fmt.Errorf("%v: %v", s, err)
 			}
 		}(s)
 	}
@@ -82,16 +78,14 @@ func run() error {
 	return nil
 }
 
-func validateFilename(s string) (bool, error) {
-	ok, err := regexp.MatchString("(^|/)\\.", s)
+func renameFile(r *renamer, path string) error {
+	ok, err := validatePath(path)
 	if err != nil {
-		return false, err
+		return err
+	} else if !ok {
+		return nil
 	}
 
-	return !ok, nil
-}
-
-func renameFile(r *renamer, path string) error {
 	p := r.Rename(path)
 
 	if p != path {
@@ -108,20 +102,44 @@ func renameFile(r *renamer, path string) error {
 		return nil
 	}
 
+	ok, err = isTextFile(p)
+	if err != nil {
+		return err
+	} else if !ok {
+		return nil
+	}
+
 	bs, err := ioutil.ReadFile(p)
 	if err != nil {
 		return err
 	}
 
-	ok, err := regexp.MatchString("octet-stream", http.DetectContentType(bs))
+	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+}
 
+func validatePath(s string) (bool, error) {
+	ok, err := regexp.MatchString("(^|/)\\.", s)
 	if err != nil {
-		return err
-	} else if ok {
-		return nil
+		return false, err
 	}
 
-	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+	return !ok, nil
+}
+
+func isTextFile(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+
+	// Read only 512 bytes for file type detection.
+	bs := make([]byte, 512)
+	_, err = f.Read(bs)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+
+	return regexp.MatchString("^text/", http.DetectContentType(bs))
 }
 
 func printError(err error) {
