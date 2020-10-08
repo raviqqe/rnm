@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/jinzhu/inflection"
+)
+
 type renamer struct {
 	patterns []*pattern
 }
@@ -14,7 +18,12 @@ func newRenamer(from string, to string, enabled map[caseName]struct{}) (*renamer
 		return nil, err
 	}
 
-	return &renamer{ps}, nil
+	pps, err := compilePatterns(inflection.Plural(from), inflection.Plural(to), enabled)
+	if err != nil {
+		return nil, err
+	}
+
+	return &renamer{append(ps, pps...)}, nil
 }
 
 func (r *renamer) Rename(s string) string {

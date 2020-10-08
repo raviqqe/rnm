@@ -58,6 +58,13 @@ func TestRenameAcronym(t *testing.T) {
 	assert.Equal(t, "UK", r.Rename("USA"))
 }
 
+func TestRenamePlurals(t *testing.T) {
+	r, err := newRenamer("bad apple", "nice orange", nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "NiceOranges", r.Rename("BadApples"))
+}
+
 func TestRenameNameInText(t *testing.T) {
 	r, err := newRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
