@@ -4,7 +4,16 @@
 [![Codecov](https://img.shields.io/codecov/c/github/raviqqe/rnm.svg?style=flat-square)](https://codecov.io/gh/raviqqe/rnm)
 [![License](https://img.shields.io/github/license/raviqqe/rnm.svg?style=flat-square)](LICENSE)
 
-Rename all names in your code!
+Yet another [`codemod`](https://github.com/facebook/codemod) alternative.
+
+Replace all occurrences of a name to another name in your code!
+
+## Features
+
+- Support for different case styles
+  - See `rnm --help` to list them all.
+- Automatic pluralization
+- Massive speed
 
 ## Install
 
