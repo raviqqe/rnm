@@ -4,7 +4,7 @@ type renamer struct {
 	patterns []*pattern
 }
 
-func newRenamer(from string, to string, enabled map[patternName]struct{}) (*renamer, error) {
+func newRenamer(from string, to string, enabled map[caseName]struct{}) (*renamer, error) {
 	if enabled == nil {
 		enabled = allPatternNames
 	}

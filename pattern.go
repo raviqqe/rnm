@@ -7,7 +7,7 @@ import (
 )
 
 type patternOptions struct {
-	name    patternName
+	name    caseName
 	convert func(string) string
 	head    delimiter
 	tail    delimiter
@@ -73,7 +73,7 @@ var patternOptionsList = []*patternOptions{
 	},
 }
 
-func compilePatterns(from string, to string, enabled map[patternName]struct{}) ([]*pattern, error) {
+func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
 	ps := make([]*pattern, 0, len(patternOptionsList))
 
 	for _, o := range patternOptionsList {

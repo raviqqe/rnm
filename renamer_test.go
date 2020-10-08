@@ -44,7 +44,7 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 }
 
 func TestRenameNameWithSpecificPattern(t *testing.T) {
-	r, err := newRenamer("bar", "bar baz", map[patternName]struct{}{kebab: {}})
+	r, err := newRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))

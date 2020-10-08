@@ -12,10 +12,10 @@ type arguments struct {
 		From string
 		To   string
 	} `positional-args:"true"`
-	RawCaseNames []patternName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	RawCaseNames []caseName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
 	Help         bool          `short:"h" long:"help" description:"Show this help"`
 	Version      bool          `long:"version" description:"Show version"`
-	CaseNames    map[patternName]struct{}
+	CaseNames    map[caseName]struct{}
 }
 
 func getArguments() (*arguments, error) {
@@ -32,7 +32,7 @@ func getArguments() (*arguments, error) {
 		fmt.Println(version)
 		os.Exit(0)
 	} else if args.RawCaseNames != nil {
-		args.CaseNames = map[patternName]struct{}{}
+		args.CaseNames = map[caseName]struct{}{}
 
 		for _, n := range args.RawCaseNames {
 			args.CaseNames[n] = struct{}{}
