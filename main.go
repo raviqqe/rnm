@@ -26,7 +26,7 @@ func run() error {
 		return err
 	}
 
-	r, err := newRenamer(args.Patterns.From, args.Patterns.To, nil)
+	r, err := newRenamer(args.Patterns.From, args.Patterns.To, args.CaseNames)
 	if err != nil {
 		return err
 	}
