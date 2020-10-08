@@ -9,12 +9,12 @@ type pattern struct {
 	To   string
 }
 
-func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
+func compilePatterns(from string, to string, cs map[caseName]struct{}) ([]*pattern, error) {
 	ps := make([]*pattern, 0, len(caseConfigurations))
 
-	for _, m := range caseConfigurations {
-		if _, ok := enabled[m.name]; ok {
-			p, err := compilePattern(from, to, m)
+	for _, c := range caseConfigurations {
+		if _, ok := cs[c.name]; ok {
+			p, err := compilePattern(from, to, c)
 			if err != nil {
 				return nil, err
 			}
