@@ -13,6 +13,7 @@ Replace all occurrences of a name to another name in your code!
 - Support for different case styles
   - See `rnm --help` to list them all.
 - Automatic pluralization
+- File renaming
 - Massive speed
 
 ## Install
