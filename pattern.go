@@ -59,7 +59,7 @@ var patternOptionsList = []*patternOptions{
 	},
 	{
 		strcase.ToLowerCamel,
-		upperCase,
+		nonAlphabet,
 		upperCase,
 	},
 }
