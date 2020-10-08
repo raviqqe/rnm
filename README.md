@@ -6,7 +6,7 @@
 
 Yet another [`codemod`](https://github.com/facebook/codemod) alternative.
 
-Replace the same name to another name in your code!
+Replace all occurrences of a name to another name in your code!
 
 ## Features
 
