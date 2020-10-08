@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"regexp"
 	"sync"
@@ -110,6 +111,14 @@ func renameFile(r *renamer, path string) error {
 	bs, err := ioutil.ReadFile(p)
 	if err != nil {
 		return err
+	}
+
+	ok, err := regexp.MatchString("octet-stream", http.DetectContentType(bs))
+
+	if err != nil {
+		return err
+	} else if ok {
+		return nil
 	}
 
 	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
