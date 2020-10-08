@@ -11,7 +11,7 @@ type arguments struct {
 	Patterns struct {
 		From string
 		To   string
-	} `positional-args:"true"`
+	} `positional-args:"true" required:"true"`
 	RawCaseNames []caseName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
 	Help         bool       `short:"h" long:"help" description:"Show this help"`
 	Version      bool       `long:"version" description:"Show version"`
