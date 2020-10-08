@@ -21,6 +21,7 @@ type arguments struct {
 func getArguments() (*arguments, error) {
 	args := arguments{}
 	p := flags.NewParser(&args, flags.PassDoubleDash)
+
 	_, err := p.Parse()
 	if err != nil {
 		return nil, err
