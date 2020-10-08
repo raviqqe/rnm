@@ -2,14 +2,14 @@ package main
 
 import "github.com/iancoleman/strcase"
 
-type caseConfig struct {
+type caseConfiguration struct {
 	name    caseName
 	convert func(string) string
 	head    delimiter
 	tail    delimiter
 }
 
-var caseConfigs = []*caseConfig{
+var caseConfigurations = []*caseConfiguration{
 	{
 		camel,
 		strcase.ToLowerCamel,

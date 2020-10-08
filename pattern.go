@@ -10,9 +10,9 @@ type pattern struct {
 }
 
 func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
-	ps := make([]*pattern, 0, len(caseConfigs))
+	ps := make([]*pattern, 0, len(caseConfigurations))
 
-	for _, m := range caseConfigs {
+	for _, m := range caseConfigurations {
 		if _, ok := enabled[m.name]; ok {
 			p, err := compilePattern(from, to, m)
 			if err != nil {
@@ -26,7 +26,7 @@ func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*
 	return ps, nil
 }
 
-func compilePattern(from string, to string, o *caseConfig) (*pattern, error) {
+func compilePattern(from string, to string, o *caseConfiguration) (*pattern, error) {
 	r, err := regexp.Compile(
 		compileDelimiter(o.head, true) +
 			o.convert(from) +
