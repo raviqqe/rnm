@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -8,13 +9,11 @@ import (
 )
 
 type arguments struct {
-	Patterns struct {
-		From string
-		To   string
-	} `positional-args:"true" required:"true"`
 	RawCaseNames []caseName `long:"enable" description:"Enable only specified cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
 	Help         bool       `short:"h" long:"help" description:"Show this help"`
 	Version      bool       `long:"version" description:"Show version"`
+	From         string
+	To           string
 	CaseNames    map[caseName]struct{}
 }
 
@@ -22,7 +21,7 @@ func getArguments() (*arguments, error) {
 	args := arguments{}
 	p := flags.NewParser(&args, flags.PassDoubleDash)
 
-	_, err := p.Parse()
+	ss, err := p.Parse()
 	if err != nil {
 		return nil, err
 	} else if args.Help {
@@ -31,7 +30,13 @@ func getArguments() (*arguments, error) {
 	} else if args.Version {
 		fmt.Println(version)
 		os.Exit(0)
-	} else if args.RawCaseNames != nil {
+	} else if len(ss) != 2 {
+		return nil, errors.New("invalid number of arguments")
+	}
+
+	args.From, args.To = ss[0], ss[1]
+
+	if args.RawCaseNames != nil {
 		args.CaseNames = map[caseName]struct{}{}
 
 		for _, n := range args.RawCaseNames {
