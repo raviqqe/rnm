@@ -25,7 +25,7 @@ For more information, see `rnm --help`.
 Given a file named `foo_bar.go`:
 
 ```go
-const FOO_BAR = 42;
+const FOO_BAR = 42
 
 type FooBar {
   fooBar int
@@ -39,7 +39,7 @@ func (f FooBar) fooBar() {
 When you run `rnm 'foo bar' 'baz qux'`, you would see a file named `baz_qux.go` with contents:
 
 ```go
-const BAZ_QUX = 42;
+const BAZ_QUX = 42
 
 type BazQux {
   bazQux int
