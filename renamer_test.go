@@ -7,12 +7,12 @@ import (
 )
 
 func TestNewRenamer(t *testing.T) {
-	_, err := newRenamer("foo", "bar")
+	_, err := newRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 }
 
 func TestRenameDifferentCases(t *testing.T) {
-	r, err := newRenamer("foo bar", "baz qux")
+	r, err := newRenamer("foo bar", "baz qux", nil)
 	assert.Nil(t, err)
 
 	for _, ss := range [][2]string{
@@ -30,7 +30,7 @@ func TestRenameDifferentCases(t *testing.T) {
 }
 
 func TestDoNotRenameDifferentCases(t *testing.T) {
-	r, err := newRenamer("foo", "bar")
+	r, err := newRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	for _, s := range []string{
@@ -43,22 +43,22 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 	}
 }
 
-func TestRenameNameMatchedWithMultiplePatterns(t *testing.T) {
-	r, err := newRenamer("bar", "bar baz")
+func TestRenameNameWithSpecificPattern(t *testing.T) {
+	r, err := newRenamer("bar", "bar baz", map[patternName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))
 }
 
 func TestRenameAcronym(t *testing.T) {
-	r, err := newRenamer("u s a", "u k")
+	r, err := newRenamer("u s a", "u k", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "UK", r.Rename("USA"))
 }
 
 func TestRenameNameInText(t *testing.T) {
-	r, err := newRenamer("foo", "bar")
+	r, err := newRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "ab bar cd", r.Rename("ab foo cd"))

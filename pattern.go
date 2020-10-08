@@ -7,6 +7,7 @@ import (
 )
 
 type patternOptions struct {
+	name    patternName
 	convert func(string) string
 	head    delimiter
 	tail    delimiter
@@ -19,6 +20,43 @@ type pattern struct {
 
 var patternOptionsList = []*patternOptions{
 	{
+		camel,
+		strcase.ToLowerCamel,
+		nonAlphabet,
+		upperCase,
+	},
+	{
+		upperCamel,
+		strcase.ToCamel,
+		lowerCase,
+		upperCase,
+	},
+	{
+		kebab,
+		strcase.ToKebab,
+		nonAlphabet,
+		nonAlphabet,
+	},
+	{
+		upperKebab,
+		strcase.ToScreamingKebab,
+		nonAlphabet,
+		nonAlphabet,
+	},
+	{
+		snake,
+		strcase.ToSnake,
+		nonAlphabet,
+		nonAlphabet,
+	},
+	{
+		upperSnake,
+		strcase.ToScreamingSnake,
+		nonAlphabet,
+		nonAlphabet,
+	},
+	{
+		space,
 		func(s string) string {
 			return strcase.ToDelimited(s, ' ')
 		},
@@ -26,54 +64,27 @@ var patternOptionsList = []*patternOptions{
 		nonAlphabet,
 	},
 	{
+		upperSpace,
 		func(s string) string {
 			return strcase.ToScreamingDelimited(s, ' ', 0, true)
 		},
 		nonAlphabet,
 		nonAlphabet,
 	},
-	{
-		strcase.ToKebab,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		strcase.ToScreamingKebab,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		strcase.ToSnake,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		strcase.ToScreamingSnake,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		strcase.ToCamel,
-		lowerCase,
-		upperCase,
-	},
-	{
-		strcase.ToLowerCamel,
-		nonAlphabet,
-		upperCase,
-	},
 }
 
-func compilePatterns(from string, to string) ([]*pattern, error) {
+func compilePatterns(from string, to string, enabled map[patternName]struct{}) ([]*pattern, error) {
 	ps := make([]*pattern, 0, len(patternOptionsList))
 
 	for _, o := range patternOptionsList {
-		p, err := compilePattern(from, to, o)
-		if err != nil {
-			return nil, err
-		}
+		if _, ok := enabled[o.name]; ok {
+			p, err := compilePattern(from, to, o)
+			if err != nil {
+				return nil, err
+			}
 
-		ps = append(ps, p)
+			ps = append(ps, p)
+		}
 	}
 
 	return ps, nil

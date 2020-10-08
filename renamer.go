@@ -4,8 +4,12 @@ type renamer struct {
 	patterns []*pattern
 }
 
-func newRenamer(from string, to string) (*renamer, error) {
-	ps, err := compilePatterns(from, to)
+func newRenamer(from string, to string, enabled map[patternName]struct{}) (*renamer, error) {
+	if enabled == nil {
+		enabled = allPatternNames
+	}
+
+	ps, err := compilePatterns(from, to, enabled)
 	if err != nil {
 		return nil, err
 	}
