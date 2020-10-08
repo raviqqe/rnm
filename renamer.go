@@ -8,17 +8,17 @@ type renamer struct {
 	patterns []*pattern
 }
 
-func newRenamer(from string, to string, enabled map[caseName]struct{}) (*renamer, error) {
-	if enabled == nil {
-		enabled = allCaseNames
+func newRenamer(from string, to string, cs map[caseName]struct{}) (*renamer, error) {
+	if cs == nil {
+		cs = allCaseNames
 	}
 
-	ps, err := compilePatterns(from, to, enabled)
+	ps, err := compilePatterns(from, to, cs)
 	if err != nil {
 		return nil, err
 	}
 
-	pps, err := compilePatterns(inflection.Plural(from), inflection.Plural(to), enabled)
+	pps, err := compilePatterns(inflection.Plural(from), inflection.Plural(to), cs)
 	if err != nil {
 		return nil, err
 	}

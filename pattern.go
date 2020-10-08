@@ -9,12 +9,12 @@ type pattern struct {
 	To   string
 }
 
-func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
+func compilePatterns(from string, to string, cs map[caseName]struct{}) ([]*pattern, error) {
 	ps := make([]*pattern, 0, len(caseConfigurations))
 
-	for _, m := range caseConfigurations {
-		if _, ok := enabled[m.name]; ok {
-			p, err := compilePattern(from, to, m)
+	for _, c := range caseConfigurations {
+		if _, ok := cs[c.name]; ok {
+			p, err := compilePattern(from, to, c)
 			if err != nil {
 				return nil, err
 			}
@@ -26,15 +26,15 @@ func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*
 	return ps, nil
 }
 
-func compilePattern(from string, to string, o *caseConfiguration) (*pattern, error) {
+func compilePattern(from string, to string, c *caseConfiguration) (*pattern, error) {
 	r, err := regexp.Compile(
-		compileDelimiter(o.head, true) +
-			o.convert(from) +
-			compileDelimiter(o.tail, false),
+		compileDelimiter(c.head, true) +
+			c.convert(from) +
+			compileDelimiter(c.tail, false),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pattern{r, "${1}" + o.convert(to) + "${2}"}, nil
+	return &pattern{r, "${1}" + c.convert(to) + "${2}"}, nil
 }
