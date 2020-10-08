@@ -24,6 +24,7 @@ func TestRenameDifferentCases(t *testing.T) {
 		{"FOO BAR", "BAZ QUX"},
 		{"AfooBar", "AfooBar"},
 		{" FooBar ", " BazQux "},
+		{"aFooBar", "aBazQux"},
 	} {
 		assert.Equal(t, ss[1], r.Rename(ss[0]))
 	}
@@ -43,8 +44,8 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 	}
 }
 
-func TestRenameNameWithSpecificPattern(t *testing.T) {
-	r, err := newRenamer("bar", "bar baz", map[patternName]struct{}{kebab: {}})
+func TestRenameNameWithSpecificCase(t *testing.T) {
+	r, err := newRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))

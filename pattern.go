@@ -2,83 +2,19 @@ package main
 
 import (
 	"regexp"
-
-	"github.com/iancoleman/strcase"
 )
-
-type patternOptions struct {
-	name    patternName
-	convert func(string) string
-	head    delimiter
-	tail    delimiter
-}
 
 type pattern struct {
 	From *regexp.Regexp
 	To   string
 }
 
-var patternOptionsList = []*patternOptions{
-	{
-		camel,
-		strcase.ToLowerCamel,
-		nonAlphabet,
-		upperCase,
-	},
-	{
-		upperCamel,
-		strcase.ToCamel,
-		lowerCase,
-		upperCase,
-	},
-	{
-		kebab,
-		strcase.ToKebab,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		upperKebab,
-		strcase.ToScreamingKebab,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		snake,
-		strcase.ToSnake,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		upperSnake,
-		strcase.ToScreamingSnake,
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		space,
-		func(s string) string {
-			return strcase.ToDelimited(s, ' ')
-		},
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
-		upperSpace,
-		func(s string) string {
-			return strcase.ToScreamingDelimited(s, ' ', 0, true)
-		},
-		nonAlphabet,
-		nonAlphabet,
-	},
-}
+func compilePatterns(from string, to string, enabled map[caseName]struct{}) ([]*pattern, error) {
+	ps := make([]*pattern, 0, len(caseConfigurations))
 
-func compilePatterns(from string, to string, enabled map[patternName]struct{}) ([]*pattern, error) {
-	ps := make([]*pattern, 0, len(patternOptionsList))
-
-	for _, o := range patternOptionsList {
-		if _, ok := enabled[o.name]; ok {
-			p, err := compilePattern(from, to, o)
+	for _, m := range caseConfigurations {
+		if _, ok := enabled[m.name]; ok {
+			p, err := compilePattern(from, to, m)
 			if err != nil {
 				return nil, err
 			}
@@ -90,7 +26,7 @@ func compilePatterns(from string, to string, enabled map[patternName]struct{}) (
 	return ps, nil
 }
 
-func compilePattern(from string, to string, o *patternOptions) (*pattern, error) {
+func compilePattern(from string, to string, o *caseConfiguration) (*pattern, error) {
 	r, err := regexp.Compile(
 		compileDelimiter(o.head, true) +
 			o.convert(from) +
