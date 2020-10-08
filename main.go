@@ -138,12 +138,7 @@ func isTextFile(path string) (bool, error) {
 		return false, err
 	}
 
-	ok, err := regexp.MatchString("^text/", http.DetectContentType(bs))
-	if err != nil {
-		return false, err
-	}
-
-	return ok, nil
+	return regexp.MatchString("^text/", http.DetectContentType(bs))
 }
 
 func printError(err error) {
