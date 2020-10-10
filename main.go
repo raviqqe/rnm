@@ -12,7 +12,7 @@ func main() {
 	fs := osfs.New(".")
 
 	err := newCommand(
-		newFileGlobber(fs),
+		newPathGlobber(fs),
 		fs,
 		os.Stdout,
 		os.Stderr,

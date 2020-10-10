@@ -17,13 +17,13 @@ import (
 )
 
 type command struct {
-	fileGlobber *fileGlobber
+	pathGlobber *pathGlobber
 	fileSystem  billy.Filesystem
 	stdout      io.Writer
 	stderr      io.Writer
 }
 
-func newCommand(g *fileGlobber, fileSystem billy.Filesystem, stdout, stderr io.Writer) *command {
+func newCommand(g *pathGlobber, fileSystem billy.Filesystem, stdout, stderr io.Writer) *command {
 	return &command{g, fileSystem, stdout, stderr}
 }
 
@@ -44,7 +44,7 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
-	ss, err = c.fileGlobber.Glob(".")
+	ss, err = c.pathGlobber.Glob(".")
 	if err != nil {
 		return err
 	}

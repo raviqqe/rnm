@@ -2,13 +2,13 @@ package main
 
 import "gopkg.in/src-d/go-billy.v4"
 
-type fileGlobber struct{ fileSystem billy.Filesystem }
+type pathGlobber struct{ fileSystem billy.Filesystem }
 
-func newFileGlobber(fs billy.Filesystem) *fileGlobber {
-	return &fileGlobber{fs}
+func newPathGlobber(fs billy.Filesystem) *pathGlobber {
+	return &pathGlobber{fs}
 }
 
-func (g *fileGlobber) Glob(d string) ([]string, error) {
+func (g *pathGlobber) Glob(d string) ([]string, error) {
 	ps := []string{}
 	ds := []string{d}
 

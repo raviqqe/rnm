@@ -15,14 +15,14 @@ import (
 )
 
 func newTestCommand(fs billy.Filesystem) *command {
-	return newCommand(newFileGlobber(fs), fs, ioutil.Discard, ioutil.Discard)
+	return newCommand(newPathGlobber(fs), fs, ioutil.Discard, ioutil.Discard)
 }
 
 func TestCommandHelp(t *testing.T) {
 	b := &bytes.Buffer{}
 	fs := memfs.New()
 
-	err := newCommand(newFileGlobber(fs), fs, b, ioutil.Discard).Run([]string{"--help"})
+	err := newCommand(newPathGlobber(fs), fs, b, ioutil.Discard).Run([]string{"--help"})
 	assert.Nil(t, err)
 
 	cupaloy.SnapshotT(t, b.String())
@@ -32,7 +32,7 @@ func TestCommandVersion(t *testing.T) {
 	b := &bytes.Buffer{}
 	fs := memfs.New()
 
-	err := newCommand(newFileGlobber(fs), fs, b, ioutil.Discard).Run([]string{"--version"})
+	err := newCommand(newPathGlobber(fs), fs, b, ioutil.Discard).Run([]string{"--version"})
 	assert.Nil(t, err)
 
 	assert.True(
