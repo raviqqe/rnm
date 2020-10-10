@@ -48,7 +48,7 @@ func (g *pathGlobber) Glob(d string) ([]string, error) {
 }
 
 func intersectStringSets(ss, sss []string) []string {
-	sm := map[string]struct{}{}
+	sm := make(map[string]struct{}, len(sss))
 
 	for _, s := range ss {
 		sm[s] = struct{}{}
