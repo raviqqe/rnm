@@ -17,17 +17,24 @@ import (
 
 type command struct {
 	fileSystem billy.Filesystem
+	stdout     io.Writer
 	stderr     io.Writer
 }
 
-func newCommand(fileSystem billy.Filesystem, stderr io.Writer) *command {
-	return &command{fileSystem, stderr}
+func newCommand(fileSystem billy.Filesystem, stdout, stderr io.Writer) *command {
+	return &command{fileSystem, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {
 	args, err := getArguments(ss)
 	if err != nil {
 		return err
+	} else if args.Help {
+		fmt.Fprintf(c.stdout, help())
+		return nil
+	} else if args.Version {
+		fmt.Fprintf(c.stdout, version)
+		return nil
 	}
 
 	r, err := newRenamer(args.From, args.To, args.CaseNames)

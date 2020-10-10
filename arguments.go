@@ -1,13 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
+
+const usage = "[options] <from> <to>"
 
 type arguments struct {
 	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
@@ -21,17 +23,13 @@ type arguments struct {
 func getArguments(ss []string) (*arguments, error) {
 	args := arguments{}
 	p := flags.NewParser(&args, flags.PassDoubleDash)
-	p.Usage = "[options] <from> <to>"
+	p.Usage = usage
 
 	ss, err := p.ParseArgs(ss)
 	if err != nil {
 		return nil, err
-	} else if args.Help {
-		p.WriteHelp(os.Stderr)
-		os.Exit(0)
-	} else if args.Version {
-		fmt.Println(version)
-		os.Exit(0)
+	} else if args.Help || args.Version {
+		return &args, nil
 	} else if len(ss) != 2 {
 		return nil, errors.New("invalid number of arguments")
 	}
@@ -53,4 +51,17 @@ func getArguments(ss []string) (*arguments, error) {
 	}
 
 	return &args, nil
+}
+
+func help() string {
+	p := flags.NewParser(&arguments{}, flags.PassDoubleDash)
+	p.Usage = usage
+
+	// Parse() is run here to show default values in help.
+	// This seems to be a bug in go-flags.
+	p.Parse() // nolint:errcheck
+
+	b := &bytes.Buffer{}
+	p.WriteHelp(b)
+	return b.String()
 }
