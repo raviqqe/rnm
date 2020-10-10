@@ -9,7 +9,14 @@ import (
 )
 
 func main() {
-	err := newCommand(osfs.New("."), os.Stdout, os.Stderr).Run(os.Args[1:])
+	fs := osfs.New(".")
+
+	err := newCommand(
+		newFileGlobber(fs),
+		fs,
+		os.Stdout,
+		os.Stderr,
+	).Run(os.Args[1:])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, aurora.Red(err))
 		os.Exit(1)

@@ -17,13 +17,14 @@ import (
 )
 
 type command struct {
-	fileSystem billy.Filesystem
-	stdout     io.Writer
-	stderr     io.Writer
+	fileGlobber *fileGlobber
+	fileSystem  billy.Filesystem
+	stdout      io.Writer
+	stderr      io.Writer
 }
 
-func newCommand(fileSystem billy.Filesystem, stdout, stderr io.Writer) *command {
-	return &command{fileSystem, stdout, stderr}
+func newCommand(g *fileGlobber, fileSystem billy.Filesystem, stdout, stderr io.Writer) *command {
+	return &command{g, fileSystem, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {
@@ -43,7 +44,7 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
-	ss, err = c.glob()
+	ss, err = c.fileGlobber.Glob(".")
 	if err != nil {
 		return err
 	}
@@ -86,36 +87,6 @@ func (c *command) Run(ss []string) error {
 	}
 
 	return nil
-}
-
-func (c *command) glob() ([]string, error) {
-	fs := []string{}
-	ds := []string{"."}
-
-	for len(ds) != 0 {
-		d := ds[0]
-		ds = ds[1:]
-
-		is, err := c.fileSystem.ReadDir(d)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, i := range is {
-			p := c.fileSystem.Join(d, i.Name())
-
-			i, err := c.fileSystem.Lstat(p)
-			if err != nil {
-				return nil, err
-			} else if i.IsDir() {
-				ds = append(ds, p)
-			} else {
-				fs = append(fs, p)
-			}
-		}
-	}
-
-	return fs, nil
 }
 
 func (c *command) rename(r *renamer, path string) error {
