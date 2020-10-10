@@ -10,17 +10,17 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
-type gitPathFinder struct {
+type repositoryPathFinder struct {
 	fileSystem       billy.Filesystem
 	workingDirectory string
 }
 
-func newGitPathFinder(fs billy.Filesystem, workingDirectory string) *gitPathFinder {
-	return &gitPathFinder{fs, workingDirectory}
+func newRepositoryPathFinder(fs billy.Filesystem, workingDirectory string) *repositoryPathFinder {
+	return &repositoryPathFinder{fs, workingDirectory}
 }
 
-func (f *gitPathFinder) Find() ([]string, error) {
-	d := f.findGitRoot()
+func (f *repositoryPathFinder) Find() ([]string, error) {
+	d := f.findRepositoryRoot()
 	if d == "" {
 		return nil, nil
 	}
@@ -75,7 +75,7 @@ func (f *gitPathFinder) Find() ([]string, error) {
 	return ss, nil
 }
 
-func (f *gitPathFinder) findGitRoot() string {
+func (f *repositoryPathFinder) findRepositoryRoot() string {
 	s := f.workingDirectory
 
 	for {

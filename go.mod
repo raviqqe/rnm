@@ -12,5 +12,4 @@ require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/stretchr/testify v1.6.1
-	gopkg.in/src-d/go-billy.v4 v4.3.2
 )

@@ -33,33 +33,33 @@ func commitFiles(t *testing.T, fs billy.Filesystem, paths []string) {
 
 	_, err = w.Commit("foo", &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "John Doe",
-			Email: "john@doe.org",
+			Name:  "",
+			Email: "",
 			When:  time.Now(),
 		},
 	})
 	assert.Nil(t, err)
 }
 
-func TestGitPathFinderFindNoPath(t *testing.T) {
+func TestRepositoryPathFinderFindNoPath(t *testing.T) {
 	fs := memfs.New()
 	commitFiles(t, fs, nil)
 
-	ss, err := newGitPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs, ".").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
 }
 
-func TestGitPathFinderFindPath(t *testing.T) {
+func TestRepositoryPathFinderFindPath(t *testing.T) {
 	fs := memfs.New()
 	commitFiles(t, fs, []string{"foo"})
 
-	ss, err := newGitPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs, ".").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestGitPathFinderFindPathInsideDirectory(t *testing.T) {
+func TestRepositoryPathFinderFindPathInsideDirectory(t *testing.T) {
 	fs := memfs.New()
 
 	err := fs.MkdirAll("bar", 0o755)
@@ -67,12 +67,12 @@ func TestGitPathFinderFindPathInsideDirectory(t *testing.T) {
 
 	commitFiles(t, fs, []string{"bar/foo"})
 
-	ss, err := newGitPathFinder(fs, "bar").Find()
+	ss, err := newRepositoryPathFinder(fs, "bar").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestGitPathFinderFindPathOutsideDirectory(t *testing.T) {
+func TestRepositoryPathFinderFindPathOutsideDirectory(t *testing.T) {
 	fs := memfs.New()
 
 	err := fs.MkdirAll("bar", 0o755)
@@ -80,7 +80,7 @@ func TestGitPathFinderFindPathOutsideDirectory(t *testing.T) {
 
 	commitFiles(t, fs, []string{"foo"})
 
-	ss, err := newGitPathFinder(fs, "bar").Find()
+	ss, err := newRepositoryPathFinder(fs, "bar").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
 }

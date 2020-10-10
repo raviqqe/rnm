@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/logrusorgru/aurora/v3"
-	"gopkg.in/src-d/go-billy.v4/osfs"
 )
 
 func main() {
 	fs := osfs.New(".")
 
 	err := newCommand(
-		newPathGlobber(fs),
+		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
 		fs,
 		os.Stdout,
 		os.Stderr,
