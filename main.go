@@ -152,9 +152,7 @@ func getPaths() ([]string, error) {
 	sss, err := listGitFiles()
 	if err != nil {
 		return nil, err
-	}
-
-	if len(sss) == 0 {
+	} else if len(sss) == 0 {
 		return ss, nil
 	}
 
