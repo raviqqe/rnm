@@ -72,7 +72,7 @@ func TestRepositoryPathFinderFindPathInsideDirectory(t *testing.T) {
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestRepositoryPathFinderFindPathOutsideDirectory(t *testing.T) {
+func TestRepositoryPathFinderDoNotFindPathOutsideDirectory(t *testing.T) {
 	fs := memfs.New()
 
 	err := fs.MkdirAll("bar", 0o755)
