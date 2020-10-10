@@ -149,7 +149,7 @@ func (c *command) rename(r *renamer, path string) error {
 		return nil
 	}
 
-	f, err := c.fileSystem.OpenFile(p, os.O_RDWR, os.ModePerm)
+	f, err := c.fileSystem.OpenFile(p, os.O_RDWR, 0)
 	if err != nil {
 		return err
 	}
