@@ -10,10 +10,10 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
 	"github.com/logrusorgru/aurora/v3"
-	"gopkg.in/src-d/go-billy.v4"
 )
 
 type command struct {

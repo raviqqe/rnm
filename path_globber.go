@@ -1,11 +1,14 @@
 package main
 
-import "gopkg.in/src-d/go-billy.v4"
+import "github.com/go-git/go-billy/v5"
 
-type pathGlobber struct{ fileSystem billy.Filesystem }
+type pathGlobber struct {
+	repositoryPathFinder *repositoryPathFinder
+	fileSystem           billy.Filesystem
+}
 
-func newPathGlobber(fs billy.Filesystem) *pathGlobber {
-	return &pathGlobber{fs}
+func newPathGlobber(f *repositoryPathFinder, fs billy.Filesystem) *pathGlobber {
+	return &pathGlobber{f, fs}
 }
 
 func (g *pathGlobber) Glob(d string) ([]string, error) {
@@ -34,5 +37,30 @@ func (g *pathGlobber) Glob(d string) ([]string, error) {
 		}
 	}
 
-	return ps, nil
+	rps, err := g.repositoryPathFinder.Find()
+	if err != nil {
+		return nil, err
+	} else if len(rps) == 0 {
+		return ps, nil
+	}
+
+	return intersectStringSets(ps, rps), nil
+}
+
+func intersectStringSets(ss, sss []string) []string {
+	sm := make(map[string]struct{}, len(ss))
+
+	for _, s := range ss {
+		sm[s] = struct{}{}
+	}
+
+	ss = make([]string, 0, len(sm))
+
+	for _, s := range sss {
+		if _, ok := sm[s]; ok {
+			ss = append(ss, s)
+		}
+	}
+
+	return ss
 }
