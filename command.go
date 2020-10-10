@@ -39,7 +39,7 @@ func (c *command) Run(ss []string) error {
 		return nil
 	}
 
-	r, err := newRenamer(args.From, args.To, args.CaseNames)
+	r, err := newTextRenamer(args.From, args.To, args.CaseNames)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (c *command) Run(ss []string) error {
 	return nil
 }
 
-func (c *command) rename(r *renamer, path string) error {
+func (c *command) rename(r *textRenamer, path string) error {
 	ok, err := c.validatePath(path)
 	if err != nil {
 		return err
