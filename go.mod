@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
+	github.com/h2non/filetype v1.1.0
 	github.com/iancoleman/strcase v0.1.2
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/inflection v1.0.0

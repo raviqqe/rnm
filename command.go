@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"regexp"
 	"sync"
 
+	"github.com/h2non/filetype"
+	"github.com/h2non/filetype/types"
 	"github.com/logrusorgru/aurora/v3"
 	"gopkg.in/src-d/go-billy.v4"
 )
@@ -190,13 +191,18 @@ func (c *command) isTextFile(path string) (bool, error) {
 	}
 
 	// Read only 512 bytes for file type detection.
-	bs := make([]byte, 0, 512)
+	bs := make([]byte, 512)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
 		return false, err
 	}
 
-	return regexp.MatchString("^text/", http.DetectContentType(bs))
+	t, err := filetype.Match(bs)
+	if err != nil {
+		return false, err
+	}
+
+	return t == types.Unknown, nil
 }
 
 func (c *command) printError(err error) {
