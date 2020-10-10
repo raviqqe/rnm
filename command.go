@@ -190,7 +190,7 @@ func (c *command) isTextFile(path string) (bool, error) {
 	}
 
 	// Read only 512 bytes for file type detection.
-	bs := make([]byte, 512)
+	bs := make([]byte, 0, 512)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
 		return false, err
