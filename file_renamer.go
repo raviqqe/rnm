@@ -68,6 +68,11 @@ func (r *fileRenamer) Rename(tr *textRenamer, path string) error {
 		return nil
 	}
 
+	err = f.Truncate(0)
+	if err != nil {
+		return err
+	}
+
 	_, err = f.Seek(0, 0)
 	if err != nil {
 		return err
