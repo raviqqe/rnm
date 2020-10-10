@@ -162,14 +162,14 @@ func (c *command) rename(r *renamer, path string) error {
 		return err
 	}
 
-	_, err = f.Seek(0, 0)
-	if err != nil {
-		return err
-	}
-
 	bbs := []byte(r.Rename(string(bs)))
 	if bytes.Equal(bs, bbs) {
 		return nil
+	}
+
+	_, err = f.Seek(0, 0)
+	if err != nil {
+		return err
 	}
 
 	_, err = f.Write(bbs)
