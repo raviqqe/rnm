@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/logrusorgru/aurora/v3"
 	"gopkg.in/src-d/go-billy.v4"
-	"gopkg.in/src-d/go-billy.v4/util"
 )
 
 type command struct {
@@ -42,7 +42,7 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
-	ss, err = util.Glob(c.fileSystem, "**")
+	ss, err = c.glob()
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = c.renameFile(r, s)
+			err = c.rename(r, s)
 			if err != nil {
 				ec <- fmt.Errorf("%v: %v", s, err)
 			}
@@ -87,7 +87,39 @@ func (c *command) Run(ss []string) error {
 	return nil
 }
 
-func (c *command) renameFile(r *renamer, path string) error {
+func (c *command) glob() ([]string, error) {
+	fs := []string{}
+	ds := []string{"."}
+
+	for len(ds) != 0 {
+		d := ds[0]
+		ds = ds[1:]
+
+		is, err := c.fileSystem.ReadDir(d)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range is {
+			p := c.fileSystem.Join(d, i.Name())
+
+			i, err := c.fileSystem.Lstat(p)
+			if err != nil {
+				return nil, err
+			} else if i.IsDir() {
+				ds = append(ds, p)
+			} else {
+				fs = append(fs, p)
+			}
+
+		}
+
+	}
+
+	return fs, nil
+}
+
+func (c *command) rename(r *renamer, path string) error {
 	ok, err := c.validatePath(path)
 	if err != nil {
 		return err
@@ -98,13 +130,13 @@ func (c *command) renameFile(r *renamer, path string) error {
 	p := r.Rename(path)
 
 	if p != path {
-		err := os.Rename(path, p)
+		err := c.fileSystem.Rename(path, p)
 		if err != nil {
 			return err
 		}
 	}
 
-	i, err := os.Lstat(p)
+	i, err := c.fileSystem.Lstat(p)
 	if err != nil {
 		return err
 	} else if i.IsDir() {
@@ -118,12 +150,30 @@ func (c *command) renameFile(r *renamer, path string) error {
 		return nil
 	}
 
-	bs, err := ioutil.ReadFile(p)
+	f, err := c.fileSystem.OpenFile(p, os.O_RDWR, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
+	defer f.Close()
+
+	bs, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Seek(0, 0)
+	if err != nil {
+		return err
+	}
+
+	bbs := []byte(r.Rename(string(bs)))
+	if bytes.Equal(bs, bbs) {
+		return nil
+	}
+
+	_, err = f.Write(bbs)
+	return err
 }
 
 func (*command) validatePath(s string) (bool, error) {
