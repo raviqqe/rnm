@@ -111,9 +111,7 @@ func (c *command) glob() ([]string, error) {
 			} else {
 				fs = append(fs, p)
 			}
-
 		}
-
 	}
 
 	return fs, nil
