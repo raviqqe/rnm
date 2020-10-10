@@ -45,7 +45,7 @@ func TestCommandVersion(t *testing.T) {
 
 func TestCommandRun(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo"), 0222)
+	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
 	assert.Nil(t, err)
 
 	err = newTestCommand(fs).Run([]string{"foo", "bar"})

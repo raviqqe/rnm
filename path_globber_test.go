@@ -10,7 +10,7 @@ import (
 
 func TestPathGlobberGlobFile(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo"), 0222)
+	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
 	assert.Nil(t, err)
 
 	ss, err := newPathGlobber(fs).Glob(".")
@@ -20,7 +20,7 @@ func TestPathGlobberGlobFile(t *testing.T) {
 
 func TestPathGlobberGlobRecursively(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo/foo", []byte("foo"), 0222)
+	err := util.WriteFile(fs, "foo/foo", []byte("foo"), 0o222)
 	assert.Nil(t, err)
 
 	ss, err := newPathGlobber(fs).Glob(".")
