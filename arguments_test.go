@@ -26,6 +26,7 @@ func TestGetArgumentsError(t *testing.T) {
 		{},
 		{"foo"},
 		{"foo", "bar", "baz"},
+		{"-c", "caml", "foo", "bar"},
 	} {
 		_, err := getArguments(ss)
 		assert.NotNil(t, err)
