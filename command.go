@@ -11,13 +11,17 @@ import (
 	"sync"
 
 	"github.com/logrusorgru/aurora/v3"
-	"github.com/mattn/go-zglob"
+	"gopkg.in/src-d/go-billy.v4"
+	"gopkg.in/src-d/go-billy.v4/util"
 )
 
-type command struct{}
+type command struct {
+	fileSystem billy.Filesystem
+	stderr     io.Writer
+}
 
-func newCommand() *command {
-	return &command{}
+func newCommand(fileSystem billy.Filesystem, stderr io.Writer) *command {
+	return &command{fileSystem, stderr}
 }
 
 func (c *command) Run(ss []string) error {
@@ -31,7 +35,7 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
-	ss, err = zglob.Glob("**/*")
+	ss, err = util.Glob(c.fileSystem, "**")
 	if err != nil {
 		return err
 	}
@@ -48,7 +52,7 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = renameFile(r, s)
+			err = c.renameFile(r, s)
 			if err != nil {
 				ec <- fmt.Errorf("%v: %v", s, err)
 			}
@@ -66,7 +70,7 @@ func (c *command) Run(ss []string) error {
 	for err := range ec {
 		ok = false
 
-		printError(err)
+		c.printError(err)
 	}
 
 	if !ok {
@@ -76,8 +80,8 @@ func (c *command) Run(ss []string) error {
 	return nil
 }
 
-func renameFile(r *renamer, path string) error {
-	ok, err := validatePath(path)
+func (c *command) renameFile(r *renamer, path string) error {
+	ok, err := c.validatePath(path)
 	if err != nil {
 		return err
 	} else if !ok {
@@ -100,7 +104,7 @@ func renameFile(r *renamer, path string) error {
 		return nil
 	}
 
-	ok, err = isTextFile(p)
+	ok, err = c.isTextFile(p)
 	if err != nil {
 		return err
 	} else if !ok {
@@ -115,7 +119,7 @@ func renameFile(r *renamer, path string) error {
 	return ioutil.WriteFile(p, []byte(r.Rename(string(bs))), i.Mode())
 }
 
-func validatePath(s string) (bool, error) {
+func (*command) validatePath(s string) (bool, error) {
 	ok, err := regexp.MatchString("(^|/)\\.", s)
 	if err != nil {
 		return false, err
@@ -124,8 +128,8 @@ func validatePath(s string) (bool, error) {
 	return !ok, nil
 }
 
-func isTextFile(path string) (bool, error) {
-	f, err := os.Open(path)
+func (c *command) isTextFile(path string) (bool, error) {
+	f, err := c.fileSystem.Open(path)
 	if err != nil {
 		return false, err
 	}
@@ -140,6 +144,6 @@ func isTextFile(path string) (bool, error) {
 	return regexp.MatchString("^text/", http.DetectContentType(bs))
 }
 
-func printError(err error) {
-	fmt.Fprintln(os.Stderr, aurora.Red(err))
+func (c *command) printError(err error) {
+	fmt.Fprintln(c.stderr, aurora.Red(err))
 }
