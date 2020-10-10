@@ -63,14 +63,16 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 
 	err = i.ForEach(func(file *object.File) error {
 		s, err := filepath.Rel(f.workingDirectory, f.fileSystem.Join(d, file.Name))
-		if err == nil {
-			ok, err := regexp.MatchString(`^\.\./`, s)
+		if err != nil {
+			// Ignore errors assuming that they are not in the current directory.
+			return nil
+		}
 
-			if err != nil {
-				return err
-			} else if !ok {
-				ss = append(ss, s)
-			}
+		ok, err := regexp.MatchString(`^\.\./`, s)
+		if err != nil {
+			return err
+		} else if !ok {
+			ss = append(ss, s)
 		}
 
 		return nil
