@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sync"
 
@@ -33,7 +34,7 @@ func run() error {
 		return err
 	}
 
-	ss, err := zglob.Glob("**/*")
+	ss, err := getPaths()
 	if err != nil {
 		return err
 	}
@@ -133,13 +134,69 @@ func isTextFile(path string) (bool, error) {
 	}
 
 	// Read only 512 bytes for file type detection.
-	bs := make([]byte, 512)
+	bs := make([]byte, 0, 512)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
 		return false, err
 	}
 
 	return regexp.MatchString("^text/", http.DetectContentType(bs))
+}
+
+func getPaths() ([]string, error) {
+	ss, err := glob()
+	if err != nil {
+		return nil, err
+	}
+
+	sss, err := listGitFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(sss) == 0 {
+		return ss, nil
+	}
+
+	return intersectStringSets(ss, sss), nil
+}
+
+func glob() ([]string, error) {
+	ss, err := zglob.Glob("**/*")
+	if err != nil {
+		return nil, err
+	}
+
+	sss := make([]string, 0, len(ss))
+
+	for _, s := range ss {
+		s, err = filepath.Abs(s)
+		if err != nil {
+			return nil, err
+		}
+
+		sss = append(sss, s)
+	}
+
+	return sss, nil
+}
+
+func intersectStringSets(ss, sss []string) []string {
+	sm := map[string]struct{}{}
+
+	for _, s := range ss {
+		sm[s] = struct{}{}
+	}
+
+	ss = make([]string, 0, len(sm))
+
+	for _, s := range sss {
+		if _, ok := sm[s]; ok {
+			ss = append(ss, s)
+		}
+	}
+
+	return ss
 }
 
 func printError(err error) {
