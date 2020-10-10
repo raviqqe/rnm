@@ -30,10 +30,10 @@ func (c *command) Run(ss []string) error {
 	if err != nil {
 		return err
 	} else if args.Help {
-		fmt.Fprintf(c.stdout, help())
+		fmt.Fprint(c.stdout, help())
 		return nil
 	} else if args.Version {
-		fmt.Fprintf(c.stdout, version)
+		fmt.Fprintln(c.stdout, version)
 		return nil
 	}
 
