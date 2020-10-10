@@ -14,8 +14,14 @@ import (
 	"github.com/mattn/go-zglob"
 )
 
-func run() error {
-	args, err := getArguments()
+type command struct{}
+
+func newCommand() *command {
+	return &command{}
+}
+
+func (c *command) Run(ss []string) error {
+	args, err := getArguments(ss)
 	if err != nil {
 		return err
 	}
@@ -25,7 +31,7 @@ func run() error {
 		return err
 	}
 
-	ss, err := zglob.Glob("**/*")
+	ss, err = zglob.Glob("**/*")
 	if err != nil {
 		return err
 	}

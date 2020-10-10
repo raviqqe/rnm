@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	err := run()
+	err := newCommand().Run(os.Args[1:])
 	if err != nil {
 		printError(err)
 		os.Exit(1)

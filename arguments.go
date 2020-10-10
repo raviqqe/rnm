@@ -18,12 +18,12 @@ type arguments struct {
 	CaseNames    map[caseName]struct{}
 }
 
-func getArguments() (*arguments, error) {
+func getArguments(ss []string) (*arguments, error) {
 	args := arguments{}
 	p := flags.NewParser(&args, flags.PassDoubleDash)
 	p.Usage = "[options] <from> <to>"
 
-	ss, err := p.Parse()
+	ss, err := p.ParseArgs(ss)
 	if err != nil {
 		return nil, err
 	} else if args.Help {
