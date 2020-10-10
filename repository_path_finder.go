@@ -2,6 +2,7 @@ package main
 
 import (
 	"path/filepath"
+	"regexp"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-git/v5"
@@ -62,8 +63,14 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 
 	err = i.ForEach(func(file *object.File) error {
 		s, err := filepath.Rel(f.workingDirectory, f.fileSystem.Join(d, file.Name))
-		if err == nil && !filepath.HasPrefix(s, "../") {
-			ss = append(ss, s)
+		if err == nil {
+			ok, err := regexp.MatchString(`^\.\./`, s)
+
+			if err != nil {
+				return err
+			} else if !ok {
+				ss = append(ss, s)
+			}
 		}
 
 		return nil
