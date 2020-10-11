@@ -18,7 +18,7 @@ func TestFileRenamerRenameFileShrinkingAfterRenaming(t *testing.T) {
 
 	f.Close()
 
-	tr, err := newTextRenamer("bar baz", "bar", nil)
+	tr, err := newCaseTextRenamer("bar baz", "bar", nil)
 	assert.Nil(t, err)
 
 	err = newFileRenamer(fs).Rename(tr, "foo")

@@ -11,15 +11,15 @@ type caseConfiguration struct {
 
 var caseConfigurations = []*caseConfiguration{
 	{
-		camel,
-		strcase.ToLowerCamel,
-		nonAlphabet,
-		upperCase,
-	},
-	{
 		upperCamel,
 		strcase.ToCamel,
 		lowerCase,
+		upperCase,
+	},
+	{
+		camel,
+		strcase.ToLowerCamel,
+		nonAlphabet,
 		upperCase,
 	},
 	{
