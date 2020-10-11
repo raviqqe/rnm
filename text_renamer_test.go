@@ -71,3 +71,10 @@ func TestRenameNameInText(t *testing.T) {
 
 	assert.Equal(t, "ab bar cd", r.Rename("ab foo cd"))
 }
+
+func TestRenameBarePattern(t *testing.T) {
+	r, err := newTextRenamer("foo/v1", "foo/v2", nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "foo/v2", r.Rename("foo/v1"))
+}
