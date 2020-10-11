@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -14,13 +15,14 @@ import (
 
 type fileRenamer struct {
 	fileSystem billy.Filesystem
+	stderr     io.Writer
 }
 
-func newFileRenamer(fs billy.Filesystem) *fileRenamer {
-	return &fileRenamer{fs}
+func newFileRenamer(fs billy.Filesystem, stderr io.Writer) *fileRenamer {
+	return &fileRenamer{fs, stderr}
 }
 
-func (r *fileRenamer) Rename(tr textRenamer, path string) error {
+func (r *fileRenamer) Rename(tr textRenamer, path string, verbose bool) error {
 	ok, err := r.validatePath(path)
 	if err != nil {
 		return err
@@ -31,7 +33,14 @@ func (r *fileRenamer) Rename(tr textRenamer, path string) error {
 	p := tr.Rename(path)
 
 	if p != path {
-		err := r.fileSystem.Rename(path, p)
+		if verbose {
+			err := r.print("Moving", path)
+			if err != nil {
+				return err
+			}
+		}
+
+		err = r.fileSystem.Rename(path, p)
 		if err != nil {
 			return err
 		}
@@ -68,6 +77,13 @@ func (r *fileRenamer) Rename(tr textRenamer, path string) error {
 		return nil
 	}
 
+	if verbose {
+		err := r.print("Processing", path)
+		if err != nil {
+			return err
+		}
+	}
+
 	err = f.Truncate(0)
 	if err != nil {
 		return err
@@ -97,6 +113,8 @@ func (r *fileRenamer) isTextFile(path string) (bool, error) {
 		return false, err
 	}
 
+	defer f.Close()
+
 	bs := make([]byte, fileTypeDetectionBufferSize)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
@@ -109,4 +127,9 @@ func (r *fileRenamer) isTextFile(path string) (bool, error) {
 	}
 
 	return t == types.Unknown, nil
+}
+
+func (r *fileRenamer) print(xs ...interface{}) error {
+	_, err := fmt.Fprintln(r.stderr, xs...)
+	return err
 }

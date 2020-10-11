@@ -1,6 +1,8 @@
 package main
 
 import (
+	"regexp"
+
 	"github.com/jinzhu/inflection"
 )
 
@@ -12,6 +14,8 @@ func newCaseTextRenamer(from string, to string, cs map[caseName]struct{}) (textR
 	if cs == nil {
 		cs = allCaseNames
 	}
+
+	from, to = regexp.QuoteMeta(from), regexp.QuoteMeta(to)
 
 	ps, err := compilePatterns(from, to, cs)
 	if err != nil {
