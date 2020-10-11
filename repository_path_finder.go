@@ -11,6 +11,8 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
+var parentDirectoryRegexp *regexp.Regexp = regexp.MustCompile(`^\.\./`)
+
 type repositoryPathFinder struct {
 	fileSystem       billy.Filesystem
 	workingDirectory string
@@ -87,17 +89,9 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 	pps := []string{}
 
 	for _, p := range ps {
-		s, err := filepath.Rel(f.workingDirectory, p)
-		if err != nil {
-			// Ignore errors assuming that they are not in the current directory.
-			continue
-		}
-
-		ok, err := regexp.MatchString(`^\.\./`, s)
-		if err != nil {
-			return nil, err
-		} else if !ok {
-			pps = append(pps, s)
+		p, err := filepath.Rel(f.workingDirectory, p)
+		if err == nil && !parentDirectoryRegexp.MatchString(p) {
+			pps = append(pps, p)
 		}
 	}
 
