@@ -2,6 +2,7 @@ Usage:
   rnm.test [options] <from> <to>
 
 Application Options:
+  -b, --bare     Use given patterns as they are
   -c, --cases=   Comma-separated names of enabled cases (options: camel,
                  upper-camel, kebab, upper-kebab, snake, upper-snake, space,
                  upper-space)

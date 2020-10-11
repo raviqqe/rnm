@@ -11,6 +11,8 @@ func TestGetArguments(t *testing.T) {
 	for _, ss := range [][]string{
 		{"foo", "bar"},
 		{"foo", "bar", "."},
+		{"-b", "foo", "bar"},
+		{"--bare", "foo", "bar"},
 		{"-c", "camel", "foo", "bar"},
 		{"-c", "camel,kebab", "foo", "bar"},
 		{"-h"},
