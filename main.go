@@ -13,7 +13,7 @@ func main() {
 
 	err := newCommand(
 		newPathFinder(newRepositoryPathFinder(fs, "."), fs),
-		newFileRenamer(fs),
+		newFileRenamer(fs, os.Stderr),
 		fs,
 		os.Stdout,
 		os.Stderr,

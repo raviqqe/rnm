@@ -47,7 +47,7 @@ func (c *command) Run(ss []string) error {
 	if err != nil {
 		return err
 	} else if !i.IsDir() {
-		return c.fileRenamer.Rename(r, args.Path)
+		return c.fileRenamer.Rename(r, args.Path, args.Verbose)
 	}
 
 	ss, err = c.pathFinder.Find(args.Path)
@@ -67,7 +67,7 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = c.fileRenamer.Rename(r, s)
+			err = c.fileRenamer.Rename(r, s, args.Verbose)
 			if err != nil {
 				ec <- fmt.Errorf("%v: %v", s, err)
 			}
