@@ -12,7 +12,7 @@ func main() {
 	fs := osfs.New(".")
 
 	err := newCommand(
-		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
+		newPathFinder(newRepositoryPathFinder(fs, "."), fs),
 		newFileRenamer(fs),
 		fs,
 		os.Stdout,

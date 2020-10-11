@@ -2,16 +2,16 @@ package main
 
 import "github.com/go-git/go-billy/v5"
 
-type pathGlobber struct {
+type pathFinder struct {
 	repositoryPathFinder *repositoryPathFinder
 	fileSystem           billy.Filesystem
 }
 
-func newPathGlobber(f *repositoryPathFinder, fs billy.Filesystem) *pathGlobber {
-	return &pathGlobber{f, fs}
+func newPathFinder(f *repositoryPathFinder, fs billy.Filesystem) *pathFinder {
+	return &pathFinder{f, fs}
 }
 
-func (g *pathGlobber) Glob(d string) ([]string, error) {
+func (g *pathFinder) Glob(d string) ([]string, error) {
 	ps := []string{}
 	ds := []string{d}
 
