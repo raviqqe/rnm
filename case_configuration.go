@@ -19,15 +19,15 @@ var caseConfigurations = []*caseConfiguration{
 		nonAlphabet,
 	},
 	{
-		camel,
-		strcase.ToLowerCamel,
-		nonAlphabet,
-		upperCase,
-	},
-	{
 		upperCamel,
 		strcase.ToCamel,
 		lowerCase,
+		upperCase,
+	},
+	{
+		camel,
+		strcase.ToLowerCamel,
+		nonAlphabet,
 		upperCase,
 	},
 	{
