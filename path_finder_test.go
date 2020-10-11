@@ -8,38 +8,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestPathGlobber(fs billy.Filesystem) *pathGlobber {
-	return newPathGlobber(newRepositoryPathFinder(fs, "."), fs)
+func newTestPathFinder(fs billy.Filesystem) *pathFinder {
+	return newPathFinder(newRepositoryPathFinder(fs, "."), fs)
 }
 
-func TestPathGlobberGlobFile(t *testing.T) {
+func TestPathFinderFindFile(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathGlobber(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestPathGlobberGlobRecursively(t *testing.T) {
+func TestPathFinderFindRecursively(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathGlobber(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo", "foo/foo"}, ss)
 }
 
-func TestPathGlobberIncludePathsNotIncludedInRepository(t *testing.T) {
+func TestPathFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
 	commitFiles(t, fs, []string{"bar"})
 
-	ss, err := newTestPathGlobber(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar", "foo"}, ss)
 }

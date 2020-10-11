@@ -11,14 +11,14 @@ import (
 )
 
 type command struct {
-	pathGlobber *pathGlobber
+	pathFinder *pathFinder
 	fileRenamer *fileRenamer
 	fileSystem  billy.Filesystem
 	stdout      io.Writer
 	stderr      io.Writer
 }
 
-func newCommand(g *pathGlobber, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
+func newCommand(g *pathFinder, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
 	return &command{g, r, fs, stdout, stderr}
 }
 
@@ -50,7 +50,7 @@ func (c *command) Run(ss []string) error {
 		return c.fileRenamer.Rename(r, args.Path)
 	}
 
-	ss, err = c.pathGlobber.Glob(args.Path)
+	ss, err = c.pathFinder.Find(args.Path)
 	if err != nil {
 		return err
 	}
