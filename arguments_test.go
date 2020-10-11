@@ -10,6 +10,7 @@ import (
 func TestGetArguments(t *testing.T) {
 	for _, ss := range [][]string{
 		{"foo", "bar"},
+		{"foo", "bar", "."},
 		{"-c", "camel", "foo", "bar"},
 		{"-c", "camel,kebab", "foo", "bar"},
 		{"-h"},
@@ -25,7 +26,7 @@ func TestGetArgumentsError(t *testing.T) {
 	for _, ss := range [][]string{
 		{},
 		{"foo"},
-		{"foo", "bar", "baz"},
+		{"foo", "bar", "baz", "blah"},
 		{"-c", "caml", "foo", "bar"},
 	} {
 		_, err := getArguments(ss)
