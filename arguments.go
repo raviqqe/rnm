@@ -17,6 +17,7 @@ type arguments struct {
 	Version      bool   `long:"version" description:"Show version"`
 	From         string
 	To           string
+	Path         string
 	CaseNames    map[caseName]struct{}
 }
 
@@ -30,11 +31,17 @@ func getArguments(ss []string) (*arguments, error) {
 		return nil, err
 	} else if args.Help || args.Version {
 		return &args, nil
-	} else if len(ss) != 2 {
+	} else if len(ss) < 2 || len(ss) > 3 {
 		return nil, errors.New("invalid number of arguments")
 	}
 
 	args.From, args.To = ss[0], ss[1]
+
+	if len(ss) == 3 {
+		args.Path = ss[2]
+	} else {
+		args.Path = "."
+	}
 
 	if args.RawCaseNames != "" {
 		args.CaseNames = map[caseName]struct{}{}

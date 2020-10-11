@@ -6,18 +6,20 @@ import (
 	"io"
 	"sync"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/logrusorgru/aurora/v3"
 )
 
 type command struct {
 	pathGlobber *pathGlobber
 	fileRenamer *fileRenamer
+	fileSystem  billy.Filesystem
 	stdout      io.Writer
 	stderr      io.Writer
 }
 
-func newCommand(g *pathGlobber, r *fileRenamer, stdout, stderr io.Writer) *command {
-	return &command{g, r, stdout, stderr}
+func newCommand(g *pathGlobber, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
+	return &command{g, r, fs, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {
@@ -37,7 +39,14 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
-	ss, err = c.pathGlobber.Glob(".")
+	i, err := c.fileSystem.Lstat(args.Path)
+	if err != nil {
+		return err
+	} else if !i.IsDir() {
+		return c.fileRenamer.Rename(r, args.Path)
+	}
+
+	ss, err = c.pathGlobber.Glob(args.Path)
 	if err != nil {
 		return err
 	}
