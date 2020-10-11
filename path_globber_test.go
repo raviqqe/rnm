@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
-	"github.com/go-git/go-billy/v5/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +14,7 @@ func newTestPathGlobber(fs billy.Filesystem) *pathGlobber {
 
 func TestPathGlobberGlobFile(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
+	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
 	ss, err := newTestPathGlobber(fs).Glob(".")
@@ -25,7 +24,7 @@ func TestPathGlobberGlobFile(t *testing.T) {
 
 func TestPathGlobberGlobRecursively(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo/foo", []byte("foo"), 0o222)
+	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
 	ss, err := newTestPathGlobber(fs).Glob(".")
@@ -33,14 +32,14 @@ func TestPathGlobberGlobRecursively(t *testing.T) {
 	assert.Equal(t, []string{"foo", "foo/foo"}, ss)
 }
 
-func TestPathGlobberDoNotIncludePathsNotIncludedInRepository(t *testing.T) {
+func TestPathGlobberIncludePathsNotIncludedInRepository(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
+	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
 	commitFiles(t, fs, []string{"bar"})
 
 	ss, err := newTestPathGlobber(fs).Glob(".")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"bar"}, ss)
+	assert.Equal(t, []string{"bar", "foo"}, ss)
 }

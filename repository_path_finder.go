@@ -11,6 +11,8 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
+var parentDirectoryRegexp *regexp.Regexp = regexp.MustCompile(`^\.\./`)
+
 type repositoryPathFinder struct {
 	fileSystem       billy.Filesystem
 	workingDirectory string
@@ -59,21 +61,10 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 		return nil, err
 	}
 
-	ss := []string{}
+	ps := []string{}
 
 	err = i.ForEach(func(file *object.File) error {
-		s, err := filepath.Rel(f.workingDirectory, f.fileSystem.Join(d, file.Name))
-		if err != nil {
-			// Ignore errors assuming that they are not in the current directory.
-			return nil
-		}
-
-		ok, err := regexp.MatchString(`^\.\./`, s)
-		if err != nil {
-			return err
-		} else if !ok {
-			ss = append(ss, s)
-		}
+		ps = append(ps, f.fileSystem.Join(d, file.Name))
 
 		return nil
 	})
@@ -81,7 +72,30 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 		return nil, err
 	}
 
-	return ss, nil
+	w, err := r.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	st, err := w.Status()
+	if err != nil {
+		return nil, err
+	}
+
+	for p := range st {
+		ps = append(ps, p)
+	}
+
+	pps := []string{}
+
+	for _, p := range ps {
+		p, err := filepath.Rel(f.workingDirectory, p)
+		if err == nil && !parentDirectoryRegexp.MatchString(p) {
+			pps = append(pps, p)
+		}
+	}
+
+	return pps, nil
 }
 
 func (f *repositoryPathFinder) findRepositoryRoot() string {
