@@ -113,6 +113,8 @@ func (r *fileRenamer) isTextFile(path string) (bool, error) {
 		return false, err
 	}
 
+	defer f.Close()
+
 	bs := make([]byte, fileTypeDetectionBufferSize)
 	_, err = f.Read(bs)
 	if err != nil && err != io.EOF {
