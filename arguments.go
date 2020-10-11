@@ -9,7 +9,7 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-const usage = "[options] <from> <to>"
+const usage = "[options] <from> <to> [<path>]"
 
 type arguments struct {
 	Bare         bool   `short:"b" long:"bare" description:"Use patterns as they are"`
