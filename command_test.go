@@ -17,6 +17,7 @@ func newTestCommand(fs billy.Filesystem) *command {
 	return newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
 		newFileRenamer(fs),
+		fs,
 		ioutil.Discard,
 		ioutil.Discard,
 	)
@@ -29,6 +30,7 @@ func TestCommandHelp(t *testing.T) {
 	err := newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
 		newFileRenamer(fs),
+		fs,
 		b,
 		ioutil.Discard,
 	).Run([]string{"--help"})
@@ -44,6 +46,7 @@ func TestCommandVersion(t *testing.T) {
 	err := newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
 		newFileRenamer(fs),
+		fs,
 		b,
 		ioutil.Discard,
 	).Run([]string{"--version"})
@@ -72,4 +75,64 @@ func TestCommandRun(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
+}
+
+func TestCommandRenameOnlyFile(t *testing.T) {
+	fs := memfs.New()
+	err := util.WriteFile(fs, "foo", []byte("baz"), 0o222)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(fs, "bar", []byte("baz"), 0o222)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foo")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "blah", string(bs))
+
+	f, err = fs.Open("bar")
+	assert.Nil(t, err)
+
+	bs, err = ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "baz", string(bs))
+}
+
+func TestCommandRenameOnlyDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(fs, "foo/foo", []byte("baz"), 0o222)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(fs, "bar", []byte("baz"), 0o222)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foo/foo")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "blah", string(bs))
+
+	f, err = fs.Open("bar")
+	assert.Nil(t, err)
+
+	bs, err = ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "baz", string(bs))
 }
