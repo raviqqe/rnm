@@ -11,14 +11,6 @@ type caseConfiguration struct {
 
 var caseConfigurations = []*caseConfiguration{
 	{
-		bare,
-		func(s string) string {
-			return s
-		},
-		nonAlphabet,
-		nonAlphabet,
-	},
-	{
 		upperCamel,
 		strcase.ToCamel,
 		lowerCase,

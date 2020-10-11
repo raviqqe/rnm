@@ -12,7 +12,7 @@ import (
 const usage = "[options] <from> <to>"
 
 type arguments struct {
-	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled cases (options: bare, camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
 	Help         bool   `short:"h" long:"help" description:"Show this help"`
 	Version      bool   `long:"version" description:"Show version"`
 	From         string

@@ -3,7 +3,6 @@ package main
 type caseName string
 
 const (
-	bare       caseName = "bare"
 	camel      caseName = "camel"
 	upperCamel caseName = "upper-camel"
 	kebab      caseName = "kebab"
@@ -15,7 +14,6 @@ const (
 )
 
 var allCaseNames = map[caseName]struct{}{
-	bare:       {},
 	camel:      {},
 	upperCamel: {},
 	kebab:      {},
