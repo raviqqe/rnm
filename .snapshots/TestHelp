@@ -1,5 +1,5 @@
 Usage:
-  rnm.test [options] <from> <to>
+  rnm.test [options] <from> <to> [<path>]
 
 Application Options:
   -b, --bare     Use patterns as they are
