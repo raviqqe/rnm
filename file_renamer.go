@@ -20,7 +20,7 @@ func newFileRenamer(fs billy.Filesystem) *fileRenamer {
 	return &fileRenamer{fs}
 }
 
-func (r *fileRenamer) Rename(tr *textRenamer, path string) error {
+func (r *fileRenamer) Rename(tr *caseTextRenamer, path string) error {
 	ok, err := r.validatePath(path)
 	if err != nil {
 		return err

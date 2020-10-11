@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewTextRenamer(t *testing.T) {
-	_, err := newTextRenamer("foo", "bar", nil)
+func TestNewCaseTextRenamer(t *testing.T) {
+	_, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 }
 
 func TestRenameDifferentCases(t *testing.T) {
-	r, err := newTextRenamer("foo bar", "baz qux", nil)
+	r, err := newCaseTextRenamer("foo bar", "baz qux", nil)
 	assert.Nil(t, err)
 
 	for _, ss := range [][2]string{
@@ -31,7 +31,7 @@ func TestRenameDifferentCases(t *testing.T) {
 }
 
 func TestDoNotRenameDifferentCases(t *testing.T) {
-	r, err := newTextRenamer("foo", "bar", nil)
+	r, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	for _, s := range []string{
@@ -45,42 +45,42 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 }
 
 func TestRenameNameWithSpecificCase(t *testing.T) {
-	r, err := newTextRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
+	r, err := newCaseTextRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))
 }
 
 func TestRenameAcronym(t *testing.T) {
-	r, err := newTextRenamer("u s a", "u k", nil)
+	r, err := newCaseTextRenamer("u s a", "u k", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "UK", r.Rename("USA"))
 }
 
 func TestRenamePlurals(t *testing.T) {
-	r, err := newTextRenamer("bad apple", "nice orange", nil)
+	r, err := newCaseTextRenamer("bad apple", "nice orange", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "NiceOranges", r.Rename("BadApples"))
 }
 
 func TestRenameNameInText(t *testing.T) {
-	r, err := newTextRenamer("foo", "bar", nil)
+	r, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "ab bar cd", r.Rename("ab foo cd"))
 }
 
 func TestRenameBarePattern(t *testing.T) {
-	r, err := newTextRenamer("foo/v1", "foo/v2", nil)
+	r, err := newCaseTextRenamer("foo/v1", "foo/v2", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo/v2", r.Rename("foo/v1"))
 }
 
 func TestRenameCamelCaseMatchingBothLowerAndUpperCamelPatterns(t *testing.T) {
-	r, err := newTextRenamer("foo bar", "baz foo bar", nil)
+	r, err := newCaseTextRenamer("foo bar", "baz foo bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bazFooBar", r.Rename("fooBar"))

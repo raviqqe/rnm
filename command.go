@@ -34,7 +34,7 @@ func (c *command) Run(ss []string) error {
 		return nil
 	}
 
-	r, err := newTextRenamer(args.From, args.To, args.CaseNames)
+	r, err := newCaseTextRenamer(args.From, args.To, args.CaseNames)
 	if err != nil {
 		return err
 	}

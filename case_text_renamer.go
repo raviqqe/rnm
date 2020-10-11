@@ -4,11 +4,11 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
-type textRenamer struct {
+type caseTextRenamer struct {
 	patterns []*pattern
 }
 
-func newTextRenamer(from string, to string, cs map[caseName]struct{}) (*textRenamer, error) {
+func newCaseTextRenamer(from string, to string, cs map[caseName]struct{}) (*caseTextRenamer, error) {
 	if cs == nil {
 		cs = allCaseNames
 	}
@@ -23,10 +23,10 @@ func newTextRenamer(from string, to string, cs map[caseName]struct{}) (*textRena
 		return nil, err
 	}
 
-	return &textRenamer{append(ps, pps...)}, nil
+	return &caseTextRenamer{append(ps, pps...)}, nil
 }
 
-func (r *textRenamer) Rename(s string) string {
+func (r *caseTextRenamer) Rename(s string) string {
 	for _, p := range r.patterns {
 		s = p.From.ReplaceAllString(s, p.To)
 	}
