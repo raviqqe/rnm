@@ -34,9 +34,13 @@ func (c *command) Run(ss []string) error {
 		return nil
 	}
 
-	r, err := newCaseTextRenamer(args.From, args.To, args.CaseNames)
-	if err != nil {
-		return err
+	r := newBareTextRenamer(args.From, args.To)
+
+	if !args.Bare {
+		r, err = newCaseTextRenamer(args.From, args.To, args.CaseNames)
+		if err != nil {
+			return err
+		}
 	}
 
 	i, err := c.fileSystem.Lstat(args.Path)

@@ -8,7 +8,7 @@ type caseTextRenamer struct {
 	patterns []*pattern
 }
 
-func newCaseTextRenamer(from string, to string, cs map[caseName]struct{}) (*caseTextRenamer, error) {
+func newCaseTextRenamer(from string, to string, cs map[caseName]struct{}) (textRenamer, error) {
 	if cs == nil {
 		cs = allCaseNames
 	}

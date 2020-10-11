@@ -136,3 +136,20 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 
 	assert.Equal(t, "baz", string(bs))
 }
+
+func TestCommandRenameWithBarePattern(t *testing.T) {
+	fs := memfs.New()
+	err := util.WriteFile(fs, "foo", []byte("foo()"), 0o222)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs).Run([]string{"--bare", "foo(", "bar("})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foo")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "bar()", string(bs))
+}
