@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
+	"github.com/go-git/go-billy/v5/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -69,6 +70,21 @@ func TestRepositoryPathFinderFindUncommittedPath(t *testing.T) {
 	ss, err := newRepositoryPathFinder(fs, ".").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
+}
+
+func TestRepositoryPathFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
+	fs := memfs.New()
+	commitFiles(t, fs, nil)
+
+	err := util.WriteFile(fs, ".gitignore", []byte("foo\n"), 0o444)
+	assert.Nil(t, err)
+
+	_, err = fs.Create("foo")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	assert.Nil(t, err)
+	assert.Equal(t, []string{".gitignore"}, ss)
 }
 
 func TestRepositoryPathFinderFindPathInsideDirectory(t *testing.T) {
