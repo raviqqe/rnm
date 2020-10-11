@@ -11,7 +11,7 @@ import (
 )
 
 type command struct {
-	pathFinder *pathFinder
+	pathFinder  *pathFinder
 	fileRenamer *fileRenamer
 	fileSystem  billy.Filesystem
 	stdout      io.Writer
