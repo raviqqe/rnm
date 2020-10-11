@@ -62,7 +62,7 @@ func TestCommandVersion(t *testing.T) {
 
 func TestCommandRun(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
+	err := util.WriteFile(fs, "foo", []byte("foo"), 0o444)
 	assert.Nil(t, err)
 
 	err = newTestCommand(fs).Run([]string{"foo", "bar"})
@@ -79,10 +79,10 @@ func TestCommandRun(t *testing.T) {
 
 func TestCommandRenameOnlyFile(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("baz"), 0o222)
+	err := util.WriteFile(fs, "foo", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
-	err = util.WriteFile(fs, "bar", []byte("baz"), 0o222)
+	err = util.WriteFile(fs, "bar", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
 	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
@@ -111,10 +111,10 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 	err := fs.MkdirAll("foo", 0o755)
 	assert.Nil(t, err)
 
-	err = util.WriteFile(fs, "foo/foo", []byte("baz"), 0o222)
+	err = util.WriteFile(fs, "foo/foo", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
-	err = util.WriteFile(fs, "bar", []byte("baz"), 0o222)
+	err = util.WriteFile(fs, "bar", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
 	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
@@ -139,7 +139,7 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 
 func TestCommandRenameWithBarePattern(t *testing.T) {
 	fs := memfs.New()
-	err := util.WriteFile(fs, "foo", []byte("foo()"), 0o222)
+	err := util.WriteFile(fs, "foo", []byte("foo()"), 0o444)
 	assert.Nil(t, err)
 
 	err = newTestCommand(fs).Run([]string{"--bare", "foo(", "bar("})
