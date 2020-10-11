@@ -11,7 +11,7 @@ func newPathFinder(f *repositoryPathFinder, fs billy.Filesystem) *pathFinder {
 	return &pathFinder{f, fs}
 }
 
-func (g *pathFinder) Glob(d string) ([]string, error) {
+func (g *pathFinder) Find(d string) ([]string, error) {
 	ps := []string{}
 	ds := []string{d}
 

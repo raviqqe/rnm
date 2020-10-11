@@ -12,22 +12,22 @@ func newTestPathFinder(fs billy.Filesystem) *pathFinder {
 	return newPathFinder(newRepositoryPathFinder(fs, "."), fs)
 }
 
-func TestPathFinderGlobFile(t *testing.T) {
+func TestPathFinderFindFile(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestPathFinderGlobRecursively(t *testing.T) {
+func TestPathFinderFindRecursively(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo", "foo/foo"}, ss)
 }
@@ -39,7 +39,7 @@ func TestPathFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 
 	commitFiles(t, fs, []string{"bar"})
 
-	ss, err := newTestPathFinder(fs).Glob(".")
+	ss, err := newTestPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar", "foo"}, ss)
 }

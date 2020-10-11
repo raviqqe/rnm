@@ -50,7 +50,7 @@ func (c *command) Run(ss []string) error {
 		return c.fileRenamer.Rename(r, args.Path)
 	}
 
-	ss, err = c.pathFinder.Glob(args.Path)
+	ss, err = c.pathFinder.Find(args.Path)
 	if err != nil {
 		return err
 	}
