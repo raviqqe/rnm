@@ -50,9 +50,21 @@ func TestRepositoryPathFinderFindNoPath(t *testing.T) {
 	assert.Equal(t, []string{}, ss)
 }
 
-func TestRepositoryPathFinderFindPath(t *testing.T) {
+func TestRepositoryPathFinderFindCommittedPath(t *testing.T) {
 	fs := memfs.New()
 	commitFiles(t, fs, []string{"foo"})
+
+	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"foo"}, ss)
+}
+
+func TestRepositoryPathFinderFindUncommittedPath(t *testing.T) {
+	fs := memfs.New()
+	commitFiles(t, fs, nil)
+
+	_, err := fs.Create("foo")
+	assert.Nil(t, err)
 
 	ss, err := newRepositoryPathFinder(fs, ".").Find()
 	assert.Nil(t, err)
@@ -83,4 +95,20 @@ func TestRepositoryPathFinderDoNotFindPathOutsideDirectory(t *testing.T) {
 	ss, err := newRepositoryPathFinder(fs, "bar").Find()
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
+}
+
+func TestRepositoryPathFinderFindUncommittedPathInsideDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("bar", 0o755)
+	assert.Nil(t, err)
+
+	commitFiles(t, fs, nil)
+
+	_, err = fs.Create("bar/foo")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryPathFinder(fs, "bar").Find()
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"foo"}, ss)
 }

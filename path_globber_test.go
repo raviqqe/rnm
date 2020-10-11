@@ -33,7 +33,7 @@ func TestPathGlobberGlobRecursively(t *testing.T) {
 	assert.Equal(t, []string{"foo", "foo/foo"}, ss)
 }
 
-func TestPathGlobberDoNotIncludePathsNotIncludedInRepository(t *testing.T) {
+func TestPathGlobberIncludePathsNotIncludedInRepository(t *testing.T) {
 	fs := memfs.New()
 	err := util.WriteFile(fs, "foo", []byte("foo"), 0o222)
 	assert.Nil(t, err)
@@ -42,5 +42,5 @@ func TestPathGlobberDoNotIncludePathsNotIncludedInRepository(t *testing.T) {
 
 	ss, err := newTestPathGlobber(fs).Glob(".")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"bar"}, ss)
+	assert.Equal(t, []string{"bar", "foo"}, ss)
 }
