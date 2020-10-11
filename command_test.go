@@ -16,7 +16,7 @@ import (
 func newTestCommand(fs billy.Filesystem) *command {
 	return newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
-		fs,
+		newFileRenamer(fs),
 		ioutil.Discard,
 		ioutil.Discard,
 	)
@@ -28,7 +28,7 @@ func TestCommandHelp(t *testing.T) {
 
 	err := newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
-		fs,
+		newFileRenamer(fs),
 		b,
 		ioutil.Discard,
 	).Run([]string{"--help"})
@@ -43,7 +43,7 @@ func TestCommandVersion(t *testing.T) {
 
 	err := newCommand(
 		newPathGlobber(newRepositoryPathFinder(fs, "."), fs),
-		fs,
+		newFileRenamer(fs),
 		b,
 		ioutil.Discard,
 	).Run([]string{"--version"})

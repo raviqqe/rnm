@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewRenamer(t *testing.T) {
-	_, err := newRenamer("foo", "bar", nil)
+func TestNewTextRenamer(t *testing.T) {
+	_, err := newTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 }
 
 func TestRenameDifferentCases(t *testing.T) {
-	r, err := newRenamer("foo bar", "baz qux", nil)
+	r, err := newTextRenamer("foo bar", "baz qux", nil)
 	assert.Nil(t, err)
 
 	for _, ss := range [][2]string{
@@ -31,7 +31,7 @@ func TestRenameDifferentCases(t *testing.T) {
 }
 
 func TestDoNotRenameDifferentCases(t *testing.T) {
-	r, err := newRenamer("foo", "bar", nil)
+	r, err := newTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	for _, s := range []string{
@@ -45,28 +45,28 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 }
 
 func TestRenameNameWithSpecificCase(t *testing.T) {
-	r, err := newRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
+	r, err := newTextRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))
 }
 
 func TestRenameAcronym(t *testing.T) {
-	r, err := newRenamer("u s a", "u k", nil)
+	r, err := newTextRenamer("u s a", "u k", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "UK", r.Rename("USA"))
 }
 
 func TestRenamePlurals(t *testing.T) {
-	r, err := newRenamer("bad apple", "nice orange", nil)
+	r, err := newTextRenamer("bad apple", "nice orange", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "NiceOranges", r.Rename("BadApples"))
 }
 
 func TestRenameNameInText(t *testing.T) {
-	r, err := newRenamer("foo", "bar", nil)
+	r, err := newTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "ab bar cd", r.Rename("ab foo cd"))
