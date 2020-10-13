@@ -79,7 +79,7 @@ func TestCaseTextRenamerRenameCamelCaseMatchingBothLowerAndUpperCamelPatterns(t 
 	assert.Equal(t, "bazFooBar", r.Rename("fooBar"))
 }
 
-func TestCaseTextRenamerRenameNameWithRegularExpressionCharacters(t *testing.T) {
+func TestCaseTextRenamerRenameNameWithRegexpCharacters(t *testing.T) {
 	r, err := newCaseTextRenamer("foo(", "bar(", nil)
 	assert.Nil(t, err)
 
@@ -91,4 +91,11 @@ func TestCaseTextRenamerFallbackToDefaultText(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "ふー", r.Rename("foo"))
+}
+
+func TestCaseTextRenamerReplaceWithPatternIncludingRegexpCharacter(t *testing.T) {
+	r, err := newCaseTextRenamer("foo", "\\", nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "\\", r.Rename("foo"))
 }
