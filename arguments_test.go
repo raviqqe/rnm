@@ -42,7 +42,8 @@ func TestGetArgumentsError(t *testing.T) {
 
 func TestHelp(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skipf("skipping test on %s", runtime.GOOS)
+		t.Skip()
 	}
+
 	cupaloy.SnapshotT(t, help())
 }

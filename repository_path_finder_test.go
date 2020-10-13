@@ -110,7 +110,7 @@ func TestRepositoryPathFinderDoNotFindPathOutsideDirectory(t *testing.T) {
 
 	ss, err := newRepositoryPathFinder(fs, "bar").Find()
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, normalize(ss))
+	assert.Equal(t, []string{}, normalizePaths(ss))
 }
 
 func TestRepositoryPathFinderFindUncommittedPathInsideDirectory(t *testing.T) {

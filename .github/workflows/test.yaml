@@ -4,11 +4,15 @@ on:
   pull_request:
 jobs:
   test:
-    runs-on: ubuntu-latest
-    container:
-      image: golang
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
       - run: go build
       - uses: golangci/golangci-lint-action@v2
       - run: go test -covermode atomic -coverprofile coverage.txt

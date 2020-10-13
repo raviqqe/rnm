@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
+	"runtime"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
@@ -33,6 +34,10 @@ func TestFileRenamerRenameFileShrinkingAfterRenaming(t *testing.T) {
 }
 
 func TestFileRenamerRenameFileWithVerboseOption(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
+
 	fs := memfs.New()
 
 	err := util.WriteFile(fs, "foo", []byte("foo"), 0o444)

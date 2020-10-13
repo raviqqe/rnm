@@ -11,7 +11,7 @@ func TestNewCaseTextRenamer(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestRenameDifferentCases(t *testing.T) {
+func TestCaseTextRenamerRenameDifferentCases(t *testing.T) {
 	r, err := newCaseTextRenamer("foo bar", "baz qux", nil)
 	assert.Nil(t, err)
 
@@ -30,7 +30,7 @@ func TestRenameDifferentCases(t *testing.T) {
 	}
 }
 
-func TestDoNotRenameDifferentCases(t *testing.T) {
+func TestCaseTextRenamerDoNotRenameDifferentCases(t *testing.T) {
 	r, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
@@ -44,44 +44,51 @@ func TestDoNotRenameDifferentCases(t *testing.T) {
 	}
 }
 
-func TestRenameNameWithSpecificCase(t *testing.T) {
+func TestCaseTextRenamerRenameNameWithSpecificCase(t *testing.T) {
 	r, err := newCaseTextRenamer("bar", "bar baz", map[caseName]struct{}{kebab: {}})
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foo-bar-baz-baz", r.Rename("foo-bar-baz"))
 }
 
-func TestRenameAcronym(t *testing.T) {
+func TestCaseTextRenamerRenameAcronym(t *testing.T) {
 	r, err := newCaseTextRenamer("u s a", "u k", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "UK", r.Rename("USA"))
 }
 
-func TestRenamePlurals(t *testing.T) {
+func TestCaseTextRenamerRenamePlurals(t *testing.T) {
 	r, err := newCaseTextRenamer("bad apple", "nice orange", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "NiceOranges", r.Rename("BadApples"))
 }
 
-func TestRenameNameInText(t *testing.T) {
+func TestCaseTextRenamerRenameNameInText(t *testing.T) {
 	r, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "ab bar cd", r.Rename("ab foo cd"))
 }
 
-func TestRenameCamelCaseMatchingBothLowerAndUpperCamelPatterns(t *testing.T) {
+func TestCaseTextRenamerRenameCamelCaseMatchingBothLowerAndUpperCamelPatterns(t *testing.T) {
 	r, err := newCaseTextRenamer("foo bar", "baz foo bar", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bazFooBar", r.Rename("fooBar"))
 }
 
-func TestRenameNameWithRegularExpressionCharacters(t *testing.T) {
+func TestCaseTextRenamerRenameNameWithRegularExpressionCharacters(t *testing.T) {
 	r, err := newCaseTextRenamer("foo(", "bar(", nil)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar()", r.Rename("foo()"))
+}
+
+func TestCaseTextRenamerFallbackToDefaultText(t *testing.T) {
+	r, err := newCaseTextRenamer("foo", "ふー", nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "ふー", r.Rename("foo"))
 }
