@@ -16,6 +16,6 @@ jobs:
       - run: go build
       - uses: golangci/golangci-lint-action@v2
         with:
-          args: --timeout 300
+          args: --timeout 5m
       - run: go test -covermode atomic -coverprofile coverage.txt
       - uses: codecov/codecov-action@v1
