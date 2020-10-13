@@ -90,7 +90,7 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 
 	for _, p := range ps {
 		p, err := filepath.Rel(f.workingDirectory, p)
-		if err == nil && !parentDirectoryRegexp.MatchString(p) {
+		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(p)) {
 			pps = append(pps, p)
 		}
 	}
