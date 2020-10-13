@@ -15,7 +15,7 @@ func newCaseTextRenamer(from string, to string, cs map[caseName]struct{}) (textR
 		cs = allCaseNames
 	}
 
-	from, to = regexp.QuoteMeta(from), regexp.QuoteMeta(to)
+	from = regexp.QuoteMeta(from)
 
 	ps, err := compilePatterns(from, to, cs)
 	if err != nil {

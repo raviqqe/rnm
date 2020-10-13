@@ -10,6 +10,10 @@ func TestBareRenamerRename(t *testing.T) {
 	assert.Equal(t, "bar", newBareTextRenamer("foo", "bar").Rename("foo"))
 }
 
-func TestBareRenamerRenameWithRegexpCharacter(t *testing.T) {
+func TestBareRenamerRenameWithUnclosedParenthesis(t *testing.T) {
 	assert.Equal(t, "bar(", newBareTextRenamer("foo(", "bar(").Rename("foo("))
+}
+
+func TestBareRenamerReplaceWithRegexpCharacter(t *testing.T) {
+	assert.Equal(t, "\\", newBareTextRenamer("foo", "\\").Rename("foo"))
 }
