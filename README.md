@@ -37,7 +37,7 @@ Given a file named `foo_bar.go`:
 ```go
 const FOO_BAR = 42
 
-type FooBar {
+type FooBar struct {
   fooBar int
 }
 
@@ -51,7 +51,7 @@ When you run `rnm 'foo bar' 'baz qux'`, you would see a file named `baz_qux.go` 
 ```go
 const BAZ_QUX = 42
 
-type BazQux {
+type BazQux struct {
   bazQux int
 }
 
