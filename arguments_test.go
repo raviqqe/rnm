@@ -1,6 +1,7 @@
 package main
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
@@ -40,5 +41,8 @@ func TestGetArgumentsError(t *testing.T) {
 }
 
 func TestHelp(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skipf("skipping test on %s", runtime.GOOS)
+	}
 	cupaloy.SnapshotT(t, help())
 }
