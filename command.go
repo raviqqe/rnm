@@ -46,7 +46,7 @@ func (c *command) Run(ss []string) error {
 		}
 	}
 
-	i, err := c.fileSystem.Lstat(p)
+	i, err := c.fileSystem.Stat(p)
 	if err != nil {
 		return err
 	} else if !i.IsDir() {
