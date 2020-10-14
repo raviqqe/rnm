@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/go-git/go-billy/v5"
@@ -22,7 +23,7 @@ func newFileRenamer(fs billy.Filesystem, stderr io.Writer) *fileRenamer {
 	return &fileRenamer{fs, stderr}
 }
 
-func (r *fileRenamer) Rename(tr textRenamer, path string, verbose bool) error {
+func (r *fileRenamer) Rename(tr textRenamer, path string, baseDir string, verbose bool) error {
 	ok, err := r.validatePath(path)
 	if err != nil {
 		return err
@@ -30,7 +31,10 @@ func (r *fileRenamer) Rename(tr textRenamer, path string, verbose bool) error {
 		return nil
 	}
 
-	p := tr.Rename(path)
+	p, err := r.renamePath(tr, path, baseDir)
+	if err != nil {
+		return err
+	}
 
 	if p != path {
 		if verbose {
@@ -127,6 +131,19 @@ func (r *fileRenamer) isTextFile(path string) (bool, error) {
 	}
 
 	return t == types.Unknown, nil
+}
+
+func (r *fileRenamer) renamePath(tr textRenamer, path, baseDir string) (string, error) {
+	if baseDir == "" {
+		return path, nil
+	}
+
+	b, err := filepath.Rel(baseDir, path)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(baseDir, tr.Rename(b)), nil
 }
 
 func (r *fileRenamer) print(xs ...interface{}) error {
