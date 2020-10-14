@@ -46,7 +46,7 @@ func (r *fileRenamer) Rename(tr textRenamer, path string, verbose bool) error {
 		}
 	}
 
-	i, err := r.fileSystem.Lstat(p)
+	i, err := r.fileSystem.Stat(p)
 	if err != nil {
 		return err
 	} else if i.IsDir() {

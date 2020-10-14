@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
+	"os"
 	"runtime"
 	"testing"
 
@@ -51,4 +52,54 @@ func TestFileRenamerRenameFileWithVerboseOption(t *testing.T) {
 	assert.Nil(t, err)
 
 	cupaloy.SnapshotT(t, b.String())
+}
+
+func TestFileRenamerRenameSymlinkToFile(t *testing.T) {
+	fs := memfs.New()
+
+	err := util.WriteFile(fs, "baz", []byte("foo"), 0o444)
+	assert.Nil(t, err)
+
+	err = fs.Symlink("baz", "foo")
+	assert.Nil(t, err)
+
+	tr, err := newCaseTextRenamer("foo", "bar", nil)
+	assert.Nil(t, err)
+
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", true)
+	assert.Nil(t, err)
+
+	i, err := fs.Lstat("bar")
+	assert.Nil(t, err)
+
+	assert.True(t, i.Mode()&os.ModeSymlink > 0)
+
+	f, err := fs.Open("bar")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "bar", string(bs))
+}
+
+func TestFileRenamerRenameSymlinkToDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("baz", 0o755)
+	assert.Nil(t, err)
+
+	err = fs.Symlink("baz", "foo")
+	assert.Nil(t, err)
+
+	tr, err := newCaseTextRenamer("foo", "bar", nil)
+	assert.Nil(t, err)
+
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", true)
+	assert.Nil(t, err)
+
+	i, err := fs.Lstat("bar")
+	assert.Nil(t, err)
+
+	assert.True(t, i.Mode()&os.ModeSymlink > 0)
 }

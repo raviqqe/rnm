@@ -99,16 +99,16 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 }
 
 func (f *repositoryPathFinder) findRepositoryRoot() string {
-	s := f.workingDirectory
+	d := f.workingDirectory
 
 	for {
-		_, err := f.fileSystem.Lstat(f.fileSystem.Join(s, ".git"))
+		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
 		if err == nil {
-			return s
+			return d
 		} else if err == billy.ErrCrossedBoundary {
 			return ""
 		}
 
-		s = f.fileSystem.Join(s, "..")
+		d = f.fileSystem.Join(d, "..")
 	}
 }
