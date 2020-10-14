@@ -37,7 +37,7 @@ func (g *pathFinder) Find(d string) ([]string, error) {
 		}
 	}
 
-	rps, err := g.repositoryPathFinder.Find()
+	rps, err := g.repositoryPathFinder.Find(d)
 	if err != nil {
 		return nil, err
 	} else if len(rps) == 0 {

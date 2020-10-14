@@ -46,7 +46,7 @@ func TestRepositoryPathFinderFindNoPath(t *testing.T) {
 	fs := memfs.New()
 	commitFiles(t, fs, nil)
 
-	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
 }
@@ -55,7 +55,7 @@ func TestRepositoryPathFinderFindCommittedPath(t *testing.T) {
 	fs := memfs.New()
 	commitFiles(t, fs, []string{"foo"})
 
-	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
@@ -67,7 +67,7 @@ func TestRepositoryPathFinderFindUncommittedPath(t *testing.T) {
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
@@ -82,7 +82,7 @@ func TestRepositoryPathFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
 	_, err = fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newRepositoryPathFinder(fs, ".").Find()
+	ss, err := newRepositoryPathFinder(fs).Find(".")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{".gitignore"}, ss)
 }
@@ -95,7 +95,7 @@ func TestRepositoryPathFinderFindPathInsideDirectory(t *testing.T) {
 
 	commitFiles(t, fs, []string{"bar/foo"})
 
-	ss, err := newRepositoryPathFinder(fs, "bar").Find()
+	ss, err := newRepositoryPathFinder(fs).Find("bar")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
@@ -108,7 +108,7 @@ func TestRepositoryPathFinderDoNotFindPathOutsideDirectory(t *testing.T) {
 
 	commitFiles(t, fs, []string{"foo"})
 
-	ss, err := newRepositoryPathFinder(fs, "bar").Find()
+	ss, err := newRepositoryPathFinder(fs).Find("bar")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, normalizePaths(ss))
 }
@@ -124,7 +124,7 @@ func TestRepositoryPathFinderFindUncommittedPathInsideDirectory(t *testing.T) {
 	_, err = fs.Create("bar/foo")
 	assert.Nil(t, err)
 
-	ss, err := newRepositoryPathFinder(fs, "bar").Find()
+	ss, err := newRepositoryPathFinder(fs).Find("bar")
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }

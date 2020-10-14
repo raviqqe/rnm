@@ -11,7 +11,7 @@ import (
 )
 
 func newTestPathFinder(fs billy.Filesystem) *pathFinder {
-	return newPathFinder(newRepositoryPathFinder(fs, "."), fs)
+	return newPathFinder(newRepositoryPathFinder(fs), fs)
 }
 
 func normalizePaths(ss []string) []string {

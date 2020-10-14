@@ -14,26 +14,25 @@ import (
 var parentDirectoryRegexp *regexp.Regexp = regexp.MustCompile(`^\.\./`)
 
 type repositoryPathFinder struct {
-	fileSystem       billy.Filesystem
-	workingDirectory string
+	fileSystem billy.Filesystem
 }
 
-func newRepositoryPathFinder(fs billy.Filesystem, workingDirectory string) *repositoryPathFinder {
-	return &repositoryPathFinder{fs, workingDirectory}
+func newRepositoryPathFinder(fs billy.Filesystem) *repositoryPathFinder {
+	return &repositoryPathFinder{fs}
 }
 
-func (f *repositoryPathFinder) Find() ([]string, error) {
-	d := f.findRepositoryRoot()
-	if d == "" {
+func (f *repositoryPathFinder) Find(d string) ([]string, error) {
+	rd := f.findRepositoryRoot(d)
+	if rd == "" {
 		return nil, nil
 	}
 
-	gd, err := f.fileSystem.Chroot(f.fileSystem.Join(d, ".git"))
+	gd, err := f.fileSystem.Chroot(f.fileSystem.Join(rd, ".git"))
 	if err != nil {
 		return nil, err
 	}
 
-	wd, err := f.fileSystem.Chroot(d)
+	wd, err := f.fileSystem.Chroot(rd)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 	ps := []string{}
 
 	err = i.ForEach(func(file *object.File) error {
-		ps = append(ps, f.fileSystem.Join(d, file.Name))
+		ps = append(ps, f.fileSystem.Join(rd, file.Name))
 
 		return nil
 	})
@@ -89,7 +88,7 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 	pps := []string{}
 
 	for _, p := range ps {
-		p, err := filepath.Rel(f.workingDirectory, p)
+		p, err := filepath.Rel(d, p)
 		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(p)) {
 			pps = append(pps, p)
 		}
@@ -98,9 +97,7 @@ func (f *repositoryPathFinder) Find() ([]string, error) {
 	return pps, nil
 }
 
-func (f *repositoryPathFinder) findRepositoryRoot() string {
-	d := f.workingDirectory
-
+func (f *repositoryPathFinder) findRepositoryRoot(d string) string {
 	for {
 		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
 		if err == nil {
