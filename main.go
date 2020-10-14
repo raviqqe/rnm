@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/logrusorgru/aurora/v3"
@@ -13,17 +15,27 @@ func main() {
 	stdout := colorable.NewColorableStdout()
 	stderr := colorable.NewColorableStderr()
 
-	fs := osfs.New(".")
+	fs := osfs.New(filepath.FromSlash("/"))
 
-	err := newCommand(
+	d, err := os.Getwd()
+	if err != nil {
+		fail(stderr, err)
+	}
+
+	err = newCommand(
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, os.Stderr),
 		fs,
+		d,
 		stdout,
 		stderr,
 	).Run(os.Args[1:])
 	if err != nil {
-		fmt.Fprintln(stderr, aurora.Red(err))
-		os.Exit(1)
+		fail(stderr, err)
 	}
+}
+
+func fail(stderr io.Writer, err error) {
+	fmt.Fprintln(stderr, aurora.Red(err))
+	os.Exit(1)
 }
