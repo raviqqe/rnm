@@ -16,7 +16,7 @@ func main() {
 	fs := osfs.New(".")
 
 	err := newCommand(
-		newPathFinder(newRepositoryPathFinder(fs, "."), fs),
+		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, os.Stderr),
 		fs,
 		stdout,
