@@ -97,7 +97,7 @@ func TestRepositoryPathFinderFindPathInsideDirectory(t *testing.T) {
 
 	ss, err := newRepositoryPathFinder(fs).Find("bar")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"bar/foo"}, ss)
+	assert.Equal(t, []string{"bar/foo"}, normalizePaths(ss))
 }
 
 func TestRepositoryPathFinderFindPathOutsideDirectory(t *testing.T) {
@@ -126,5 +126,5 @@ func TestRepositoryPathFinderFindUncommittedPathInsideDirectory(t *testing.T) {
 
 	ss, err := newRepositoryPathFinder(fs).Find("bar")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"bar/foo"}, ss)
+	assert.Equal(t, []string{"bar/foo"}, normalizePaths(ss))
 }
