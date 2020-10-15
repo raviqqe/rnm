@@ -1,16 +1,12 @@
 package main
 
 import (
-	"regexp"
-
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
-
-var parentDirectoryRegexp *regexp.Regexp = regexp.MustCompile(`^\.\./`)
 
 type repositoryPathFinder struct {
 	fileSystem billy.Filesystem
