@@ -13,11 +13,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestCommand(fs billy.Filesystem) *command {
+func newTestCommand(fs billy.Filesystem, d string) *command {
 	return newCommand(
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
+		d,
 		ioutil.Discard,
 		ioutil.Discard,
 	)
@@ -31,6 +32,7 @@ func TestCommandHelp(t *testing.T) {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
+		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--help"})
@@ -47,6 +49,7 @@ func TestCommandVersion(t *testing.T) {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
+		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--version"})
@@ -65,7 +68,7 @@ func TestCommandRun(t *testing.T) {
 	err := util.WriteFile(fs, "foo", []byte("foo"), 0o444)
 	assert.Nil(t, err)
 
-	err = newTestCommand(fs).Run([]string{"foo", "bar"})
+	err = newTestCommand(fs, ".").Run([]string{"foo", "bar"})
 	assert.Nil(t, err)
 
 	f, err := fs.Open("bar")
@@ -85,7 +88,7 @@ func TestCommandRenameOnlyFile(t *testing.T) {
 	err = util.WriteFile(fs, "bar", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
-	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
+	err = newTestCommand(fs, ".").Run([]string{"baz", "blah", "foo"})
 	assert.Nil(t, err)
 
 	f, err := fs.Open("foo")
@@ -117,7 +120,7 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 	err = util.WriteFile(fs, "bar", []byte("baz"), 0o444)
 	assert.Nil(t, err)
 
-	err = newTestCommand(fs).Run([]string{"baz", "blah", "foo"})
+	err = newTestCommand(fs, ".").Run([]string{"baz", "blah", "foo"})
 	assert.Nil(t, err)
 
 	f, err := fs.Open("foo/foo")
@@ -142,7 +145,7 @@ func TestCommandRenameWithBarePattern(t *testing.T) {
 	err := util.WriteFile(fs, "foo", []byte("foo()"), 0o444)
 	assert.Nil(t, err)
 
-	err = newTestCommand(fs).Run([]string{"--bare", "foo(", "bar("})
+	err = newTestCommand(fs, ".").Run([]string{"--bare", "foo(", "bar("})
 	assert.Nil(t, err)
 
 	f, err := fs.Open("foo")
@@ -152,4 +155,44 @@ func TestCommandRenameWithBarePattern(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar()", string(bs))
+}
+
+func TestCommandRenameInDirectory(t *testing.T) {
+	fs := memfs.New()
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(fs, "foo/foo", []byte("foo"), 0o444)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs, "foo").Run([]string{"foo", "bar"})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foo/bar")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "bar", string(bs))
+}
+
+func TestCommandRenameInDirectoryWithFileSpecified(t *testing.T) {
+	fs := memfs.New()
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(fs, "foo/foo", []byte("foo"), 0o444)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs, "foo").Run([]string{"foo", "bar", "foo"})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foo/bar")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "bar", string(bs))
 }

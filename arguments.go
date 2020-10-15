@@ -41,8 +41,6 @@ func getArguments(ss []string) (*arguments, error) {
 
 	if len(ss) == 3 {
 		args.Path = ss[2]
-	} else {
-		args.Path = "."
 	}
 
 	if args.RawCaseNames != "" {

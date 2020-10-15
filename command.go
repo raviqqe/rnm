@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"sync"
 
 	"github.com/go-git/go-billy/v5"
@@ -11,15 +12,16 @@ import (
 )
 
 type command struct {
-	pathFinder  *pathFinder
-	fileRenamer *fileRenamer
-	fileSystem  billy.Filesystem
-	stdout      io.Writer
-	stderr      io.Writer
+	pathFinder       *pathFinder
+	fileRenamer      *fileRenamer
+	fileSystem       billy.Filesystem
+	workingDirectory string
+	stdout           io.Writer
+	stderr           io.Writer
 }
 
-func newCommand(g *pathFinder, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
-	return &command{g, r, fs, stdout, stderr}
+func newCommand(g *pathFinder, r *fileRenamer, fs billy.Filesystem, d string, stdout, stderr io.Writer) *command {
+	return &command{g, r, fs, d, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {
@@ -34,6 +36,7 @@ func (c *command) Run(ss []string) error {
 		return nil
 	}
 
+	p := c.resolvePath(args.Path)
 	r := newBareTextRenamer(args.From, args.To)
 
 	if !args.Bare {
@@ -43,14 +46,15 @@ func (c *command) Run(ss []string) error {
 		}
 	}
 
-	i, err := c.fileSystem.Lstat(args.Path)
+	i, err := c.fileSystem.Stat(p)
 	if err != nil {
 		return err
 	} else if !i.IsDir() {
-		return c.fileRenamer.Rename(r, args.Path, args.Verbose)
+		// Rename only filenames but not their directories.
+		return c.fileRenamer.Rename(r, p, filepath.Dir(p), args.Verbose)
 	}
 
-	ss, err = c.pathFinder.Find(args.Path)
+	ss, err = c.pathFinder.Find(p)
 	if err != nil {
 		return err
 	}
@@ -67,7 +71,7 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = c.fileRenamer.Rename(r, s, args.Verbose)
+			err = c.fileRenamer.Rename(r, s, p, args.Verbose)
 			if err != nil {
 				ec <- fmt.Errorf("%v: %v", s, err)
 			}
@@ -93,6 +97,16 @@ func (c *command) Run(ss []string) error {
 	}
 
 	return nil
+}
+
+func (c *command) resolvePath(p string) string {
+	if p == "" {
+		return c.workingDirectory
+	} else if filepath.IsAbs(p) {
+		return p
+	}
+
+	return filepath.Join(c.workingDirectory, p)
 }
 
 func (c *command) printError(err error) {

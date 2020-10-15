@@ -22,7 +22,7 @@ func TestFileRenamerRenameFileShrinkingAfterRenaming(t *testing.T) {
 	tr, err := newCaseTextRenamer("bar baz", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", false)
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", false)
 	assert.Nil(t, err)
 
 	f, err := fs.Open("foo")
@@ -48,7 +48,7 @@ func TestFileRenamerRenameFileWithVerboseOption(t *testing.T) {
 	assert.Nil(t, err)
 
 	b := &bytes.Buffer{}
-	err = newFileRenamer(fs, b).Rename(tr, "foo", true)
+	err = newFileRenamer(fs, b).Rename(tr, "foo", ".", true)
 	assert.Nil(t, err)
 
 	cupaloy.SnapshotT(t, b.String())
@@ -66,7 +66,7 @@ func TestFileRenamerRenameSymlinkToFile(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", true)
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
 	assert.Nil(t, err)
 
 	i, err := fs.Lstat("bar")
@@ -95,11 +95,30 @@ func TestFileRenamerRenameSymlinkToDirectory(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", true)
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
 	assert.Nil(t, err)
 
 	i, err := fs.Lstat("bar")
 	assert.Nil(t, err)
 
 	assert.True(t, i.Mode()&os.ModeSymlink > 0)
+}
+
+func TestFileRenamerFileInDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	_, err = fs.Create("foo/foo")
+	assert.Nil(t, err)
+
+	tr, err := newCaseTextRenamer("foo", "bar", nil)
+	assert.Nil(t, err)
+
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo/foo", "foo", true)
+	assert.Nil(t, err)
+
+	_, err = fs.Lstat("foo/bar")
+	assert.Nil(t, err)
 }
