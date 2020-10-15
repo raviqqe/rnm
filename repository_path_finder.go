@@ -1,7 +1,6 @@
 package main
 
 import (
-	"path/filepath"
 	"regexp"
 
 	"github.com/go-git/go-billy/v5"
@@ -22,24 +21,24 @@ func newRepositoryPathFinder(fs billy.Filesystem) *repositoryPathFinder {
 }
 
 func (f *repositoryPathFinder) Find(d string) ([]string, error) {
-	rd := f.findRepositoryRoot(d)
-	if rd == "" {
+	d = f.findRepositoryRoot(d)
+	if d == "" {
 		return nil, nil
 	}
 
-	gd, err := f.fileSystem.Chroot(f.fileSystem.Join(rd, ".git"))
+	gd, err := f.fileSystem.Chroot(f.fileSystem.Join(d, ".git"))
 	if err != nil {
 		return nil, err
 	}
 
-	wd, err := f.fileSystem.Chroot(rd)
+	fs, err := f.fileSystem.Chroot(d)
 	if err != nil {
 		return nil, err
 	}
 
 	r, err := git.Open(
 		filesystem.NewStorage(gd, cache.NewObjectLRUDefault()),
-		wd,
+		fs,
 	)
 	if err != nil {
 		return nil, nil
@@ -63,7 +62,7 @@ func (f *repositoryPathFinder) Find(d string) ([]string, error) {
 	ps := []string{}
 
 	err = i.ForEach(func(file *object.File) error {
-		ps = append(ps, f.fileSystem.Join(rd, file.Name))
+		ps = append(ps, f.fileSystem.Join(d, file.Name))
 
 		return nil
 	})
@@ -82,19 +81,10 @@ func (f *repositoryPathFinder) Find(d string) ([]string, error) {
 	}
 
 	for p := range st {
-		ps = append(ps, p)
+		ps = append(ps, f.fileSystem.Join(d, p))
 	}
 
-	pps := []string{}
-
-	for _, p := range ps {
-		p, err := filepath.Rel(d, p)
-		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(p)) {
-			pps = append(pps, p)
-		}
-	}
-
-	return pps, nil
+	return ps, nil
 }
 
 func (f *repositoryPathFinder) findRepositoryRoot(d string) string {
