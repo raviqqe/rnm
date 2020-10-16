@@ -15,10 +15,10 @@ import (
 
 func newTestCommand(fs billy.Filesystem, d string) *command {
 	return newCommand(
+		newArgumentParser(d),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		d,
 		ioutil.Discard,
 		ioutil.Discard,
 	)
@@ -29,10 +29,10 @@ func TestCommandHelp(t *testing.T) {
 	fs := memfs.New()
 
 	err := newCommand(
+		newArgumentParser("."),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--help"})
@@ -46,10 +46,10 @@ func TestCommandVersion(t *testing.T) {
 	fs := memfs.New()
 
 	err := newCommand(
+		newArgumentParser("."),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--version"})

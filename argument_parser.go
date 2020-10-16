@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/jessevdk/go-flags"
@@ -23,12 +24,20 @@ type arguments struct {
 	CaseNames    map[caseName]struct{}
 }
 
-func getArguments(ss []string) (*arguments, error) {
-	args := arguments{}
-	p := flags.NewParser(&args, flags.PassDoubleDash)
-	p.Usage = usage
+type argumentParser struct {
+	workingDirectory string
+}
 
-	ss, err := p.ParseArgs(ss)
+func newArgumentParser(d string) *argumentParser {
+	return &argumentParser{d}
+}
+
+func (p *argumentParser) Parse(ss []string) (*arguments, error) {
+	args := arguments{}
+	parser := flags.NewParser(&args, flags.PassDoubleDash)
+	parser.Usage = usage
+
+	ss, err := parser.ParseArgs(ss)
 	if err != nil {
 		return nil, err
 	} else if args.Help || args.Version {
@@ -40,7 +49,9 @@ func getArguments(ss []string) (*arguments, error) {
 	args.From, args.To = ss[0], ss[1]
 
 	if len(ss) == 3 {
-		args.Path = ss[2]
+		args.Path = p.resolvePath(ss[2])
+	} else {
+		args.Path = p.workingDirectory
 	}
 
 	if args.RawCaseNames != "" {
@@ -60,7 +71,7 @@ func getArguments(ss []string) (*arguments, error) {
 	return &args, nil
 }
 
-func help() string {
+func (*argumentParser) Help() string {
 	p := flags.NewParser(&arguments{}, flags.PassDoubleDash)
 	p.Usage = usage
 
@@ -71,4 +82,12 @@ func help() string {
 	b := &bytes.Buffer{}
 	p.WriteHelp(b)
 	return b.String()
+}
+
+func (p *argumentParser) resolvePath(s string) string {
+	if filepath.IsAbs(s) {
+		return s
+	}
+
+	return filepath.Join(p.workingDirectory, s)
 }

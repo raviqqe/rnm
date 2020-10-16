@@ -23,10 +23,10 @@ func main() {
 	}
 
 	err = newCommand(
+		newArgumentParser(d),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, os.Stderr),
 		fs,
-		d,
 		stdout,
 		stderr,
 	).Run(os.Args[1:])
