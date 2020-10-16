@@ -19,7 +19,6 @@ func newTestCommand(fs billy.Filesystem, d string) *command {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		d,
 		ioutil.Discard,
 		ioutil.Discard,
 	)
@@ -34,7 +33,6 @@ func TestCommandHelp(t *testing.T) {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--help"})
@@ -52,7 +50,6 @@ func TestCommandVersion(t *testing.T) {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
-		".",
 		b,
 		ioutil.Discard,
 	).Run([]string{"--version"})

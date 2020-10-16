@@ -12,17 +12,16 @@ import (
 )
 
 type command struct {
-	argumentParser   *argumentParser
-	pathFinder       *pathFinder
-	fileRenamer      *fileRenamer
-	fileSystem       billy.Filesystem
-	workingDirectory string
-	stdout           io.Writer
-	stderr           io.Writer
+	argumentParser *argumentParser
+	pathFinder     *pathFinder
+	fileRenamer    *fileRenamer
+	fileSystem     billy.Filesystem
+	stdout         io.Writer
+	stderr         io.Writer
 }
 
-func newCommand(p *argumentParser, g *pathFinder, r *fileRenamer, fs billy.Filesystem, d string, stdout, stderr io.Writer) *command {
-	return &command{p, g, r, fs, d, stdout, stderr}
+func newCommand(p *argumentParser, g *pathFinder, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
+	return &command{p, g, r, fs, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {

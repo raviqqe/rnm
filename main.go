@@ -27,7 +27,6 @@ func main() {
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, os.Stderr),
 		fs,
-		d,
 		stdout,
 		stderr,
 	).Run(os.Args[1:])
