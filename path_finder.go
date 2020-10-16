@@ -11,7 +11,7 @@ func newPathFinder(f *repositoryPathFinder, fs billy.Filesystem) *pathFinder {
 	return &pathFinder{f, fs}
 }
 
-func (g *pathFinder) Find(d string) ([]string, error) {
+func (g *pathFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 	ps := []string{}
 	ds := []string{d}
 
@@ -37,7 +37,7 @@ func (g *pathFinder) Find(d string) ([]string, error) {
 		}
 	}
 
-	rps, err := g.repositoryPathFinder.Find(d)
+	rps, err := g.repositoryPathFinder.Find(d, ignoreUntracked)
 	if err != nil {
 		return nil, err
 	} else if len(rps) == 0 {
