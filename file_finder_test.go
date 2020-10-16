@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestPathFinder(fs billy.Filesystem) *pathFinder {
-	return newPathFinder(newRepositoryPathFinder(fs), fs)
+func newTestFileFinder(fs billy.Filesystem) *fileFinder {
+	return newFileFinder(newRepositoryPathFinder(fs), fs)
 }
 
 func normalizePaths(ss []string) []string {
@@ -23,34 +23,44 @@ func normalizePaths(ss []string) []string {
 	return ss
 }
 
-func TestPathFinderFindFile(t *testing.T) {
+func TestFileFinderFindFile(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Find(".", false)
+	ss, err := newTestFileFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
 
-func TestPathFinderFindRecursively(t *testing.T) {
+func TestFileFinderDoNotFindDirectory(t *testing.T) {
+	fs := memfs.New()
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	ss, err := newTestFileFinder(fs).Find(".", false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{}, ss)
+}
+
+func TestFileFinderFindRecursively(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Find(".", false)
+	ss, err := newTestFileFinder(fs).Find(".", false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"foo", "foo/foo"}, normalizePaths(ss))
+	assert.Equal(t, []string{"foo/foo"}, normalizePaths(ss))
 }
 
-func TestPathFinderIncludePathsNotIncludedInRepository(t *testing.T) {
+func TestFileFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
 	commitFiles(t, fs, []string{"bar"})
 
-	ss, err := newTestPathFinder(fs).Find(".", false)
+	ss, err := newTestFileFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar", "foo"}, normalizePaths(ss))
 }

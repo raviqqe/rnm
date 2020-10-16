@@ -13,14 +13,14 @@ import (
 
 type command struct {
 	argumentParser *argumentParser
-	pathFinder     *pathFinder
+	fileFinder     *fileFinder
 	fileRenamer    *fileRenamer
 	fileSystem     billy.Filesystem
 	stdout         io.Writer
 	stderr         io.Writer
 }
 
-func newCommand(p *argumentParser, g *pathFinder, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
+func newCommand(p *argumentParser, g *fileFinder, r *fileRenamer, fs billy.Filesystem, stdout, stderr io.Writer) *command {
 	return &command{p, g, r, fs, stdout, stderr}
 }
 
@@ -58,7 +58,7 @@ func (c *command) Run(ss []string) error {
 		)
 	}
 
-	ss, err = c.pathFinder.Find(args.Path, args.IgnoreUntracked)
+	ss, err = c.fileFinder.Find(args.Path, args.IgnoreUntracked)
 	if err != nil {
 		return err
 	}
