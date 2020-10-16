@@ -18,6 +18,7 @@ func TestParseArguments(t *testing.T) {
 		{"-c", "camel", "foo", "bar"},
 		{"--cases", "camel", "foo", "bar"},
 		{"-c", "camel,kebab", "foo", "bar"},
+		{"--ignore-untracked", "foo", "bar"},
 		{"-v", "foo", "bar"},
 		{"--verbose", "foo", "bar"},
 		{"-h"},

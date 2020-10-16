@@ -28,7 +28,7 @@ func TestPathFinderFindFile(t *testing.T) {
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Find(".")
+	ss, err := newTestPathFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
@@ -38,7 +38,7 @@ func TestPathFinderFindRecursively(t *testing.T) {
 	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestPathFinder(fs).Find(".")
+	ss, err := newTestPathFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo", "foo/foo"}, normalizePaths(ss))
 }
@@ -50,7 +50,7 @@ func TestPathFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 
 	commitFiles(t, fs, []string{"bar"})
 
-	ss, err := newTestPathFinder(fs).Find(".")
+	ss, err := newTestPathFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar", "foo"}, normalizePaths(ss))
 }

@@ -13,15 +13,16 @@ import (
 const usage = "[options] <from> <to> [<path>]"
 
 type arguments struct {
-	Bare         bool   `short:"b" long:"bare" description:"Use patterns as they are"`
-	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
-	Verbose      bool   `short:"v" long:"verbose" description:"Be verbose"`
-	Help         bool   `short:"h" long:"help" description:"Show this help"`
-	Version      bool   `long:"version" description:"Show version"`
-	From         string
-	To           string
-	Path         string
-	CaseNames    map[caseName]struct{}
+	Bare            bool   `short:"b" long:"bare" description:"Use patterns as they are"`
+	RawCaseNames    string `short:"c" long:"cases" description:"Comma-separated names of enabled cases (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	IgnoreUntracked bool   `long:"ignore-untracked" description:"Ignore untracked files in Git repositories"`
+	Verbose         bool   `short:"v" long:"verbose" description:"Be verbose"`
+	Help            bool   `short:"h" long:"help" description:"Show this help"`
+	Version         bool   `long:"version" description:"Show version"`
+	From            string
+	To              string
+	Path            string
+	CaseNames       map[caseName]struct{}
 }
 
 type argumentParser struct {

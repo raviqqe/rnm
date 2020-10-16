@@ -16,7 +16,7 @@ func newRepositoryPathFinder(fs billy.Filesystem) *repositoryPathFinder {
 	return &repositoryPathFinder{fs}
 }
 
-func (f *repositoryPathFinder) Find(d string) ([]string, error) {
+func (f *repositoryPathFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 	d = f.findRepositoryRoot(d)
 	if d == "" {
 		return nil, nil
@@ -37,7 +37,7 @@ func (f *repositoryPathFinder) Find(d string) ([]string, error) {
 		fs,
 	)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	ref, err := r.Head()
@@ -66,18 +66,20 @@ func (f *repositoryPathFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
-	w, err := r.Worktree()
-	if err != nil {
-		return nil, err
-	}
+	if !ignoreUntracked {
+		w, err := r.Worktree()
+		if err != nil {
+			return nil, err
+		}
 
-	st, err := w.Status()
-	if err != nil {
-		return nil, err
-	}
+		st, err := w.Status()
+		if err != nil {
+			return nil, err
+		}
 
-	for p := range st {
-		ps = append(ps, f.fileSystem.Join(d, p))
+		for p := range st {
+			ps = append(ps, f.fileSystem.Join(d, p))
+		}
 	}
 
 	return ps, nil
