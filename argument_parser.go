@@ -49,9 +49,9 @@ func (p *argumentParser) Parse(ss []string) (*arguments, error) {
 	args.From, args.To = ss[0], ss[1]
 
 	if len(ss) == 3 {
-		args.Path = ss[2]
+		args.Path = p.resolvePath(ss[2])
 	} else {
-		args.Path = p.resolvePath(args.Path)
+		args.Path = p.workingDirectory
 	}
 
 	if args.RawCaseNames != "" {
@@ -85,9 +85,7 @@ func (*argumentParser) Help() string {
 }
 
 func (p *argumentParser) resolvePath(s string) string {
-	if s == "" {
-		return p.workingDirectory
-	} else if filepath.IsAbs(s) {
+	if filepath.IsAbs(s) {
 		return s
 	}
 

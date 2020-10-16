@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetArguments(t *testing.T) {
+func TestParseArguments(t *testing.T) {
 	for _, ss := range [][]string{
 		{"foo", "bar"},
 		{"foo", "bar", "."},
@@ -28,7 +29,7 @@ func TestGetArguments(t *testing.T) {
 	}
 }
 
-func TestGetArgumentsError(t *testing.T) {
+func TestParseArgumentsError(t *testing.T) {
 	for _, ss := range [][]string{
 		{},
 		{"foo"},
@@ -38,6 +39,13 @@ func TestGetArgumentsError(t *testing.T) {
 		_, err := newArgumentParser(".").Parse(ss)
 		assert.NotNil(t, err)
 	}
+}
+
+func TestParseArgumentsResolvingPath(t *testing.T) {
+	args, err := newArgumentParser("foo").Parse([]string{"foo", "foo", "bar"})
+	assert.Nil(t, err)
+
+	assert.Equal(t, filepath.FromSlash("foo/bar"), args.Path)
 }
 
 func TestHelp(t *testing.T) {
