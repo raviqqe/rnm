@@ -83,7 +83,20 @@ func TestFileRenamerRenameSymlinkToFile(t *testing.T) {
 	assert.Equal(t, "bar", string(bs))
 }
 
-func TestFileRenamerRenameSymlinkToDirectory(t *testing.T) {
+func TestFileRenamerFailToRenameDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	tr, err := newCaseTextRenamer("foo", "bar", nil)
+	assert.Nil(t, err)
+
+	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
+	assert.Error(t, err)
+}
+
+func TestFileRenamerFailToRenameSymlinkToDirectory(t *testing.T) {
 	fs := memfs.New()
 
 	err := fs.MkdirAll("baz", 0o755)
@@ -96,12 +109,7 @@ func TestFileRenamerRenameSymlinkToDirectory(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
-	assert.Nil(t, err)
-
-	i, err := fs.Lstat("bar")
-	assert.Nil(t, err)
-
-	assert.True(t, i.Mode()&os.ModeSymlink > 0)
+	assert.Error(t, err)
 }
 
 func TestFileRenamerFileInDirectory(t *testing.T) {

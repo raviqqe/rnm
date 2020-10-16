@@ -24,7 +24,7 @@ func main() {
 
 	err = newCommand(
 		newArgumentParser(d),
-		newPathFinder(newRepositoryPathFinder(fs), fs),
+		newFileFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, os.Stderr),
 		fs,
 		stdout,
