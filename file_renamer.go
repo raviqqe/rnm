@@ -50,13 +50,6 @@ func (r *fileRenamer) Rename(tr textRenamer, path string, baseDir string, verbos
 		}
 	}
 
-	i, err := r.fileSystem.Stat(p)
-	if err != nil {
-		return err
-	} else if i.IsDir() {
-		return nil
-	}
-
 	ok, err = r.isTextFile(p)
 	if err != nil {
 		return err
