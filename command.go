@@ -63,11 +63,29 @@ func (c *command) Run(ss []string) error {
 		return err
 	}
 
+	fs := make([]string, 0, len(ss))
+
+	// Rename all directories first to avoid concurrency bugs.
+	// It assumes that a number of directories is quite small compared to a number of files.
+	for _, s := range ss {
+		i, err := c.fileSystem.Stat(s)
+		if err != nil {
+			return err
+		} else if i.IsDir() {
+			err = c.renameFile(r, s, args.Path, args.Verbose)
+			if err != nil {
+				return err
+			}
+		} else {
+			fs = append(fs, s)
+		}
+	}
+
 	g := &sync.WaitGroup{}
 	sm := newSemaphore(maxOpenFiles)
 	ec := make(chan error, errorChannelCapacity)
 
-	for _, s := range ss {
+	for _, s := range fs {
 		g.Add(1)
 		go func(s string) {
 			defer g.Done()
@@ -75,9 +93,9 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = c.fileRenamer.Rename(r, s, args.Path, args.Verbose)
+			err = c.renameFile(r, s, args.Path, args.Verbose)
 			if err != nil {
-				ec <- fmt.Errorf("%v: %v", s, err)
+				ec <- err
 			}
 		}(s)
 	}
@@ -98,6 +116,15 @@ func (c *command) Run(ss []string) error {
 
 	if !ok {
 		return errors.New("failed to rename some identifiers")
+	}
+
+	return nil
+}
+
+func (c *command) renameFile(tr textRenamer, path string, baseDir string, verbose bool) error {
+	err := c.fileRenamer.Rename(tr, path, baseDir, verbose)
+	if err != nil {
+		return fmt.Errorf("%v: %v", path, err)
 	}
 
 	return nil
