@@ -1,7 +1,7 @@
 package main
 
 const (
-	version                     = "0.9.7"
+	version                     = "0.9.6"
 	errorChannelCapacity        = 512
 	maxOpenFiles                = 200 // lower than 256 on macOS by default
 	fileTypeDetectionBufferSize = 512
