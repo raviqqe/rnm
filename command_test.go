@@ -15,6 +15,7 @@ import (
 
 func newTestCommand(fs billy.Filesystem, d string) *command {
 	return newCommand(
+		newArgumentParser(d),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
@@ -29,6 +30,7 @@ func TestCommandHelp(t *testing.T) {
 	fs := memfs.New()
 
 	err := newCommand(
+		newArgumentParser("."),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,
@@ -46,6 +48,7 @@ func TestCommandVersion(t *testing.T) {
 	fs := memfs.New()
 
 	err := newCommand(
+		newArgumentParser("."),
 		newPathFinder(newRepositoryPathFinder(fs), fs),
 		newFileRenamer(fs, ioutil.Discard),
 		fs,

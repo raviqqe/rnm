@@ -23,7 +23,7 @@ func TestGetArguments(t *testing.T) {
 		{"--help"},
 		{"--version"},
 	} {
-		_, err := getArguments(ss)
+		_, err := newArgumentParser(".").Parse(ss)
 		assert.Nil(t, err)
 	}
 }
@@ -35,7 +35,7 @@ func TestGetArgumentsError(t *testing.T) {
 		{"foo", "bar", "baz", "blah"},
 		{"-c", "caml", "foo", "bar"},
 	} {
-		_, err := getArguments(ss)
+		_, err := newArgumentParser(".").Parse(ss)
 		assert.NotNil(t, err)
 	}
 }
@@ -45,5 +45,5 @@ func TestHelp(t *testing.T) {
 		t.Skip()
 	}
 
-	cupaloy.SnapshotT(t, help())
+	cupaloy.SnapshotT(t, newArgumentParser(".").Help())
 }

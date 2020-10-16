@@ -12,6 +12,7 @@ import (
 )
 
 type command struct {
+	argumentParser   *argumentParser
 	pathFinder       *pathFinder
 	fileRenamer      *fileRenamer
 	fileSystem       billy.Filesystem
@@ -20,23 +21,22 @@ type command struct {
 	stderr           io.Writer
 }
 
-func newCommand(g *pathFinder, r *fileRenamer, fs billy.Filesystem, d string, stdout, stderr io.Writer) *command {
-	return &command{g, r, fs, d, stdout, stderr}
+func newCommand(p *argumentParser, g *pathFinder, r *fileRenamer, fs billy.Filesystem, d string, stdout, stderr io.Writer) *command {
+	return &command{p, g, r, fs, d, stdout, stderr}
 }
 
 func (c *command) Run(ss []string) error {
-	args, err := getArguments(ss)
+	args, err := c.argumentParser.Parse(ss)
 	if err != nil {
 		return err
 	} else if args.Help {
-		fmt.Fprint(c.stdout, help())
+		fmt.Fprint(c.stdout, c.argumentParser.Help())
 		return nil
 	} else if args.Version {
 		fmt.Fprintln(c.stdout, version)
 		return nil
 	}
 
-	p := c.resolvePath(args.Path)
 	r := newBareTextRenamer(args.From, args.To)
 
 	if !args.Bare {
@@ -46,15 +46,20 @@ func (c *command) Run(ss []string) error {
 		}
 	}
 
-	i, err := c.fileSystem.Stat(p)
+	i, err := c.fileSystem.Stat(args.Path)
 	if err != nil {
 		return err
 	} else if !i.IsDir() {
 		// Rename only filenames but not their directories.
-		return c.fileRenamer.Rename(r, p, filepath.Dir(p), args.Verbose)
+		return c.fileRenamer.Rename(
+			r,
+			args.Path,
+			filepath.Dir(args.Path),
+			args.Verbose,
+		)
 	}
 
-	ss, err = c.pathFinder.Find(p)
+	ss, err = c.pathFinder.Find(args.Path)
 	if err != nil {
 		return err
 	}
@@ -71,7 +76,7 @@ func (c *command) Run(ss []string) error {
 			sm.Request()
 			defer sm.Release()
 
-			err = c.fileRenamer.Rename(r, s, p, args.Verbose)
+			err = c.fileRenamer.Rename(r, s, args.Path, args.Verbose)
 			if err != nil {
 				ec <- fmt.Errorf("%v: %v", s, err)
 			}
@@ -97,16 +102,6 @@ func (c *command) Run(ss []string) error {
 	}
 
 	return nil
-}
-
-func (c *command) resolvePath(p string) string {
-	if p == "" {
-		return c.workingDirectory
-	} else if filepath.IsAbs(p) {
-		return p
-	}
-
-	return filepath.Join(c.workingDirectory, p)
 }
 
 func (c *command) printError(err error) {
