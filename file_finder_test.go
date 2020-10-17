@@ -82,5 +82,5 @@ func TestFileFinderFindFileInHiddenDirectory(t *testing.T) {
 
 	ss, err := newTestFileFinder(fs).Find(".foo", false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{".foo/foo"}, ss)
+	assert.Equal(t, []string{".foo/foo"}, normalizePaths(ss))
 }
