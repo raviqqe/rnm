@@ -104,16 +104,10 @@ func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
 		i, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
 		if err == nil && i.IsDir() {
 			return d
-		} else if err == billy.ErrCrossedBoundary {
+		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
 			return ""
 		}
 
-		dd := f.fileSystem.Join(d, "..")
-
-		if d == dd {
-			return ""
-		}
-
-		d = dd
+		d = filepath.Dir(d)
 	}
 }
