@@ -67,7 +67,7 @@ func (r *fileRenamer) Rename(tr textRenamer, path string, baseDir string, verbos
 	}
 
 	if verbose {
-		err := r.print("Processing", path)
+		err := r.print("Writing", path)
 		if err != nil {
 			return err
 		}
