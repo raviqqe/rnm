@@ -17,8 +17,8 @@ func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
-func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	fs, err := g.repositoryFileFinder.Find(d, ignoreUntracked)
+func (f *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+	fs, err := f.repositoryFileFinder.Find(d, ignoreUntracked)
 	if err != nil {
 		return nil, err
 	} else if len(fs) != 0 {
@@ -32,7 +32,7 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		d := ds[0]
 		ds = ds[1:]
 
-		is, err := g.fileSystem.ReadDir(d)
+		is, err := f.fileSystem.ReadDir(d)
 		if err != nil {
 			return nil, err
 		}
@@ -42,9 +42,9 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 				continue
 			}
 
-			p := g.fileSystem.Join(d, i.Name())
+			p := f.fileSystem.Join(d, i.Name())
 
-			i, err := g.fileSystem.Lstat(p)
+			i, err := f.fileSystem.Lstat(p)
 			if err != nil {
 				return nil, err
 			} else if i.IsDir() {
