@@ -1,12 +1,17 @@
 package main
 
 import (
+	"path/filepath"
+	"regexp"
+
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
+
+var parentDirectoryRegexp = regexp.MustCompile(`^\.\./`)
 
 type repositoryFileFinder struct {
 	fileSystem billy.Filesystem
@@ -17,17 +22,17 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	d = f.findWorktreeDirectory(d)
-	if d == "" {
+	wd := f.findWorktreeDirectory(d)
+	if wd == "" {
 		return nil, nil
 	}
 
-	gfs, err := f.fileSystem.Chroot(f.fileSystem.Join(d, ".git"))
+	gfs, err := f.fileSystem.Chroot(f.fileSystem.Join(wd, ".git"))
 	if err != nil {
 		return nil, err
 	}
 
-	wfs, err := f.fileSystem.Chroot(d)
+	wfs, err := f.fileSystem.Chroot(wd)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +63,7 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 	ps := []string{}
 
 	err = i.ForEach(func(file *object.File) error {
-		ps = append(ps, f.fileSystem.Join(d, file.Name))
+		ps = append(ps, f.fileSystem.Join(wd, file.Name))
 
 		return nil
 	})
@@ -78,11 +83,20 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 		}
 
 		for p := range st {
-			ps = append(ps, f.fileSystem.Join(d, p))
+			ps = append(ps, f.fileSystem.Join(wd, p))
 		}
 	}
 
-	return ps, nil
+	pps := make([]string, 0, len(ps))
+
+	for _, p := range ps {
+		b, err := filepath.Rel(d, p)
+		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(b)) {
+			pps = append(pps, p)
+		}
+	}
+
+	return pps, nil
 }
 
 func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {

@@ -122,7 +122,7 @@ func TestRepositoryFileFinderFindPathOutsideDirectory(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find("bar", false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"foo"}, normalizePaths(ss))
+	assert.Equal(t, []string{}, normalizePaths(ss))
 }
 
 func TestRepositoryFileFinderFindUncommittedPathInsideDirectory(t *testing.T) {
@@ -139,6 +139,25 @@ func TestRepositoryFileFinderFindUncommittedPathInsideDirectory(t *testing.T) {
 	ss, err := newRepositoryFileFinder(fs).Find("bar", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar/foo"}, normalizePaths(ss))
+}
+
+func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
+	fs := memfs.New()
+
+	commitFiles(t, fs, nil)
+
+	err := fs.MkdirAll("/foo", 0o755)
+	assert.Nil(t, err)
+
+	_, err = fs.Create("foo/foo")
+	assert.Nil(t, err)
+
+	_, err = fs.Create("bar")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryFileFinder(fs).Find("/foo", false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"/foo/foo"}, normalizePaths(ss))
 }
 
 // TODO Support multiple worktrees of the same repositories.
