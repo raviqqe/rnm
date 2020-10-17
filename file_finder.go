@@ -9,16 +9,16 @@ import (
 var hiddenPathRegexp = regexp.MustCompile(`^\.`)
 
 type fileFinder struct {
-	repositoryPathFinder *repositoryPathFinder
+	repositoryFileFinder *repositoryFileFinder
 	fileSystem           billy.Filesystem
 }
 
-func newFileFinder(f *repositoryPathFinder, fs billy.Filesystem) *fileFinder {
+func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
 func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	fs, err := g.repositoryPathFinder.Find(d, ignoreUntracked)
+	fs, err := g.repositoryFileFinder.Find(d, ignoreUntracked)
 	if err != nil {
 		return nil, err
 	} else if len(fs) != 0 {

@@ -8,15 +8,15 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
-type repositoryPathFinder struct {
+type repositoryFileFinder struct {
 	fileSystem billy.Filesystem
 }
 
-func newRepositoryPathFinder(fs billy.Filesystem) *repositoryPathFinder {
-	return &repositoryPathFinder{fs}
+func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
+	return &repositoryFileFinder{fs}
 }
 
-func (f *repositoryPathFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 	d = f.findRepositoryRoot(d)
 	if d == "" {
 		return nil, nil
@@ -85,7 +85,7 @@ func (f *repositoryPathFinder) Find(d string, ignoreUntracked bool) ([]string, e
 	return ps, nil
 }
 
-func (f *repositoryPathFinder) findRepositoryRoot(d string) string {
+func (f *repositoryFileFinder) findRepositoryRoot(d string) string {
 	for {
 		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
 		if err == nil {
