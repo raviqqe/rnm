@@ -25,7 +25,11 @@ func (f *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		return fs, nil
 	}
 
-	fs = []string{}
+	return f.findFiles(d)
+}
+
+func (f *fileFinder) findFiles(d string) ([]string, error) {
+	fs := []string{}
 	ds := []string{d}
 
 	for len(ds) != 0 {
