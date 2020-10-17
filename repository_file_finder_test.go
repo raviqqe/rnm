@@ -140,3 +140,36 @@ func TestRepositoryFileFinderFindUncommittedPathInsideDirectory(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar/foo"}, normalizePaths(ss))
 }
+
+// TODO Support multiple worktrees of the same repositories.
+func TestRepositoryFileFinderDoNotFindPathInDifferentWorktree(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("foo", 0o755)
+	assert.Nil(t, err)
+
+	subfs, err := fs.Chroot("foo")
+	assert.Nil(t, err)
+	commitFiles(t, subfs, nil)
+
+	err = fs.MkdirAll("bar", 0o755)
+	assert.Nil(t, err)
+
+	subfs, err = fs.Chroot("bar")
+	assert.Nil(t, err)
+
+	err = util.WriteFile(
+		fs,
+		"bar/.git",
+		[]byte("gitdir: /foo/.git"),
+		0o444,
+	)
+	assert.Nil(t, err)
+
+	_, err = fs.Create("bar/foo")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryFileFinder(fs).Find("bar", false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string(nil), normalizePaths(ss))
+}

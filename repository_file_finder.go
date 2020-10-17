@@ -87,8 +87,8 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 
 func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
 	for {
-		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
-		if err == nil {
+		i, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
+		if err == nil && i.IsDir() {
 			return d
 		} else if err == billy.ErrCrossedBoundary {
 			return ""
