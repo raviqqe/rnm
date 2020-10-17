@@ -17,7 +17,26 @@ func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
-func (f *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+func (f *fileFinder) Find(d string, excludedPattern *regexp.Regexp, ignoreUntracked bool) ([]string, error) {
+	fs, err := f.findFiles(d, ignoreUntracked)
+	if err != nil {
+		return nil, err
+	} else if excludedPattern == nil {
+		return fs, nil
+	}
+
+	ffs := make([]string, 0, len(fs))
+
+	for _, f := range fs {
+		if !excludedPattern.MatchString(f) {
+			ffs = append(ffs, f)
+		}
+	}
+
+	return ffs, nil
+}
+
+func (f *fileFinder) findFiles(d string, ignoreUntracked bool) ([]string, error) {
 	fs, err := f.repositoryFileFinder.Find(d, ignoreUntracked)
 	if err != nil {
 		return nil, err
@@ -25,10 +44,10 @@ func (f *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		return fs, nil
 	}
 
-	return f.findFiles(d)
+	return f.findFilesOutsideRepository(d)
 }
 
-func (f *fileFinder) findFiles(d string) ([]string, error) {
+func (f *fileFinder) findFilesOutsideRepository(d string) ([]string, error) {
 	fs := []string{}
 	ds := []string{d}
 
