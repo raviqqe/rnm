@@ -1,6 +1,10 @@
 package main
 
-import "github.com/go-git/go-billy/v5"
+import (
+	"regexp"
+
+	"github.com/go-git/go-billy/v5"
+)
 
 type fileFinder struct {
 	repositoryPathFinder *repositoryPathFinder
@@ -12,7 +16,14 @@ func newFileFinder(f *repositoryPathFinder, fs billy.Filesystem) *fileFinder {
 }
 
 func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	fs := []string{}
+	fs, err := g.repositoryPathFinder.Find(d, ignoreUntracked)
+	if err != nil {
+		return nil, err
+	} else if len(fs) != 0 {
+		return fs, nil
+	}
+
+	fs = []string{}
 	ds := []string{d}
 
 	for len(ds) != 0 {
@@ -25,6 +36,13 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		}
 
 		for _, i := range is {
+			ok, err := regexp.MatchString(`^\.`, i.Name())
+			if err != nil {
+				return nil, err
+			} else if ok {
+				continue
+			}
+
 			p := g.fileSystem.Join(d, i.Name())
 
 			i, err := g.fileSystem.Lstat(p)
@@ -38,30 +56,5 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		}
 	}
 
-	rps, err := g.repositoryPathFinder.Find(d, ignoreUntracked)
-	if err != nil {
-		return nil, err
-	} else if len(rps) == 0 {
-		return fs, nil
-	}
-
-	return intersectStringSets(fs, rps), nil
-}
-
-func intersectStringSets(ss, sss []string) []string {
-	sm := make(map[string]struct{}, len(ss))
-
-	for _, s := range ss {
-		sm[s] = struct{}{}
-	}
-
-	ss = make([]string, 0, len(sm))
-
-	for _, s := range sss {
-		if _, ok := sm[s]; ok {
-			ss = append(ss, s)
-		}
-	}
-
-	return ss
+	return fs, nil
 }
