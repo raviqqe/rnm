@@ -22,19 +22,19 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 		return nil, nil
 	}
 
-	gd, err := f.fileSystem.Chroot(f.fileSystem.Join(d, ".git"))
+	gfs, err := f.fileSystem.Chroot(f.fileSystem.Join(d, ".git"))
 	if err != nil {
 		return nil, err
 	}
 
-	fs, err := f.fileSystem.Chroot(d)
+	wfs, err := f.fileSystem.Chroot(d)
 	if err != nil {
 		return nil, err
 	}
 
 	r, err := git.Open(
-		filesystem.NewStorage(gd, cache.NewObjectLRUDefault()),
-		fs,
+		filesystem.NewStorage(gfs, cache.NewObjectLRUDefault()),
+		wfs,
 	)
 	if err != nil {
 		return nil, err
