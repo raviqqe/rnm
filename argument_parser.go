@@ -15,6 +15,7 @@ const usage = "[options] <from> <to> [<path>]"
 
 type arguments struct {
 	Bare         bool   `short:"b" long:"bare" description:"Use patterns as they are"`
+	Regexp       bool   `short:"r" long:"regexp" description:"Use patterns as regular expressions"`
 	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled case styles (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
 	RawExclude   string `short:"e" long:"exclude" description:"Exclude paths matched with the given regular expression"`
 	IgnoreGit    bool   `long:"ignore-git" description:"Ignore Git repository information"`
