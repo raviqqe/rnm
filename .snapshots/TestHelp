@@ -6,6 +6,8 @@ Application Options:
   -c, --cases=            Comma-separated names of enabled case styles
                           (options: camel, upper-camel, kebab, upper-kebab,
                           snake, upper-snake, space, upper-space)
+  -e, --exclude=          Exclude paths matched with the given regular
+                          expression
       --ignore-untracked  Ignore untracked files in Git repositories
   -v, --verbose           Be verbose
   -h, --help              Show this help

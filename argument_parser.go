@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/jessevdk/go-flags"
@@ -15,6 +16,7 @@ const usage = "[options] <from> <to> [<path>]"
 type arguments struct {
 	Bare            bool   `short:"b" long:"bare" description:"Use patterns as they are"`
 	RawCaseNames    string `short:"c" long:"cases" description:"Comma-separated names of enabled case styles (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	RawExclude      string `short:"e" long:"exclude" description:"Exclude paths matched with the given regular expression"`
 	IgnoreUntracked bool   `long:"ignore-untracked" description:"Ignore untracked files in Git repositories"`
 	Verbose         bool   `short:"v" long:"verbose" description:"Be verbose"`
 	Help            bool   `short:"h" long:"help" description:"Show this help"`
@@ -23,6 +25,7 @@ type arguments struct {
 	To              string
 	Path            string
 	CaseNames       map[caseName]struct{}
+	Exclude         *regexp.Regexp
 }
 
 type argumentParser struct {
@@ -66,6 +69,13 @@ func (p *argumentParser) Parse(ss []string) (*arguments, error) {
 			}
 
 			args.CaseNames[n] = struct{}{}
+		}
+	}
+
+	if args.RawExclude != "" {
+		args.Exclude, err = regexp.Compile(args.RawExclude)
+		if err != nil {
+			return nil, err
 		}
 	}
 
