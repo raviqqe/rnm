@@ -94,6 +94,12 @@ func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
 			return ""
 		}
 
-		d = f.fileSystem.Join(d, "..")
+		dd := f.fileSystem.Join(d, "..")
+
+		if d == dd {
+			return ""
+		}
+
+		d = dd
 	}
 }

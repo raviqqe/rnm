@@ -155,9 +155,6 @@ func TestRepositoryFileFinderDoNotFindPathInDifferentWorktree(t *testing.T) {
 	err = fs.MkdirAll("bar", 0o755)
 	assert.Nil(t, err)
 
-	subfs, err = fs.Chroot("bar")
-	assert.Nil(t, err)
-
 	err = util.WriteFile(
 		fs,
 		"bar/.git",
