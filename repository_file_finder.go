@@ -22,7 +22,7 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 	return &repositoryFileFinder{fs}
 }
 
-func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 	wd, err := f.findWorktreeDirectory(d)
 	if err != nil {
 		return nil, err
@@ -74,20 +74,18 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 		return nil, err
 	}
 
-	if !ignoreUntracked {
-		w, err := r.Worktree()
-		if err != nil {
-			return nil, err
-		}
+	w, err := r.Worktree()
+	if err != nil {
+		return nil, err
+	}
 
-		st, err := w.Status()
-		if err != nil {
-			return nil, err
-		}
+	st, err := w.Status()
+	if err != nil {
+		return nil, err
+	}
 
-		for p := range st {
-			ps = append(ps, f.fileSystem.Join(wd, p))
-		}
+	for p := range st {
+		ps = append(ps, f.fileSystem.Join(wd, p))
 	}
 
 	pps := make([]string, 0, len(ps))

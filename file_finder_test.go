@@ -66,6 +66,16 @@ func TestFileFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 	assert.Equal(t, []string{"bar", "foo"}, normalizePaths(ss))
 }
 
+func TestFileFinderIgnoreGitRepositoryInformation(t *testing.T) {
+	fs := memfs.New()
+
+	commitFiles(t, fs, []string{".foo"})
+
+	ss, err := newTestFileFinder(fs).Find(".", nil, true)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{}, normalizePaths(ss))
+}
+
 func TestFileFinderDoNotFindHiddenFile(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create(".foo")
