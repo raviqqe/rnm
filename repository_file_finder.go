@@ -17,7 +17,7 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	d = f.findRepositoryRoot(d)
+	d = f.findWorktreeDirectory(d)
 	if d == "" {
 		return nil, nil
 	}
@@ -85,7 +85,7 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 	return ps, nil
 }
 
-func (f *repositoryFileFinder) findRepositoryRoot(d string) string {
+func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
 	for {
 		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
 		if err == nil {
