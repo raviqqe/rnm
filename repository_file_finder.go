@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 
@@ -22,8 +23,10 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
-	wd := f.findWorktreeDirectory(d)
-	if wd == "" {
+	wd, err := f.findWorktreeDirectory(d)
+	if err != nil {
+		return nil, err
+	} else if wd == "" {
 		return nil, nil
 	}
 
@@ -99,13 +102,16 @@ func (f *repositoryFileFinder) Find(d string, ignoreUntracked bool) ([]string, e
 	return pps, nil
 }
 
-func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
+func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, error) {
 	for {
-		i, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
+		p := f.fileSystem.Join(d, ".git")
+		i, err := f.fileSystem.Lstat(p)
 		if err == nil && i.IsDir() {
-			return d
+			return d, nil
+		} else if err == nil && !i.IsDir() {
+			return "", fmt.Errorf("multiple worktrees not supported: %v", p)
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
-			return ""
+			return "", nil
 		}
 
 		d = filepath.Dir(d)

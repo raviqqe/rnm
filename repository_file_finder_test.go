@@ -161,7 +161,7 @@ func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
 }
 
 // TODO Support multiple worktrees of the same repositories.
-func TestRepositoryFileFinderDoNotFindPathInDifferentWorktree(t *testing.T) {
+func TestRepositoryFileFinderFailToFindPathInDifferentWorktree(t *testing.T) {
 	fs := memfs.New()
 
 	err := fs.MkdirAll("foo", 0o755)
@@ -185,7 +185,6 @@ func TestRepositoryFileFinderDoNotFindPathInDifferentWorktree(t *testing.T) {
 	_, err = fs.Create("bar/foo")
 	assert.Nil(t, err)
 
-	ss, err := newRepositoryFileFinder(fs).Find("bar", false)
-	assert.Nil(t, err)
-	assert.Equal(t, []string(nil), normalizePaths(ss))
+	_, err = newRepositoryFileFinder(fs).Find("bar", false)
+	assert.NotNil(t, err)
 }
