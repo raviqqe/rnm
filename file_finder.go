@@ -6,6 +6,8 @@ import (
 	"github.com/go-git/go-billy/v5"
 )
 
+var hiddenPathRegexp = regexp.MustCompile(`^\.`)
+
 type fileFinder struct {
 	repositoryPathFinder *repositoryPathFinder
 	fileSystem           billy.Filesystem
@@ -36,10 +38,7 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		}
 
 		for _, i := range is {
-			ok, err := regexp.MatchString(`^\.`, i.Name())
-			if err != nil {
-				return nil, err
-			} else if ok {
+			if hiddenPathRegexp.MatchString(i.Name()) {
 				continue
 			}
 
