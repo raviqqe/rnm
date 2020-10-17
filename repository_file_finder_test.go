@@ -146,7 +146,7 @@ func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
 
 	commitFiles(t, fs, nil)
 
-	err := fs.MkdirAll("/foo", 0o755)
+	err := fs.MkdirAll("foo", 0o755)
 	assert.Nil(t, err)
 
 	_, err = fs.Create("foo/foo")
@@ -155,9 +155,9 @@ func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
 	_, err = fs.Create("bar")
 	assert.Nil(t, err)
 
-	ss, err := newRepositoryFileFinder(fs).Find("/foo", false)
+	ss, err := newRepositoryFileFinder(fs).Find("foo", false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"/foo/foo"}, normalizePaths(ss))
+	assert.Equal(t, []string{"foo/foo"}, normalizePaths(ss))
 }
 
 // TODO Support multiple worktrees of the same repositories.
