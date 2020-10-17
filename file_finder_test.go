@@ -11,7 +11,7 @@ import (
 )
 
 func newTestFileFinder(fs billy.Filesystem) *fileFinder {
-	return newFileFinder(newRepositoryPathFinder(fs), fs)
+	return newFileFinder(newRepositoryFileFinder(fs), fs)
 }
 
 func normalizePaths(ss []string) []string {
@@ -63,4 +63,24 @@ func TestFileFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 	ss, err := newTestFileFinder(fs).Find(".", false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar", "foo"}, normalizePaths(ss))
+}
+
+func TestFileFinderDoNotFindHiddenFile(t *testing.T) {
+	fs := memfs.New()
+	_, err := fs.Create(".foo")
+	assert.Nil(t, err)
+
+	ss, err := newTestFileFinder(fs).Find(".", false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{}, ss)
+}
+
+func TestFileFinderFindFileInHiddenDirectory(t *testing.T) {
+	fs := memfs.New()
+	_, err := fs.Create(".foo/foo")
+	assert.Nil(t, err)
+
+	ss, err := newTestFileFinder(fs).Find(".foo", false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{".foo/foo"}, normalizePaths(ss))
 }

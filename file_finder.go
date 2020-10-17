@@ -1,17 +1,34 @@
 package main
 
-import "github.com/go-git/go-billy/v5"
+import (
+	"regexp"
+
+	"github.com/go-git/go-billy/v5"
+)
+
+var hiddenPathRegexp = regexp.MustCompile(`^\.`)
 
 type fileFinder struct {
-	repositoryPathFinder *repositoryPathFinder
+	repositoryFileFinder *repositoryFileFinder
 	fileSystem           billy.Filesystem
 }
 
-func newFileFinder(f *repositoryPathFinder, fs billy.Filesystem) *fileFinder {
+func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
-func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+func (f *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
+	fs, err := f.repositoryFileFinder.Find(d, ignoreUntracked)
+	if err != nil {
+		return nil, err
+	} else if len(fs) != 0 {
+		return fs, nil
+	}
+
+	return f.findFiles(d)
+}
+
+func (f *fileFinder) findFiles(d string) ([]string, error) {
 	fs := []string{}
 	ds := []string{d}
 
@@ -19,15 +36,19 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		d := ds[0]
 		ds = ds[1:]
 
-		is, err := g.fileSystem.ReadDir(d)
+		is, err := f.fileSystem.ReadDir(d)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, i := range is {
-			p := g.fileSystem.Join(d, i.Name())
+			if hiddenPathRegexp.MatchString(i.Name()) {
+				continue
+			}
 
-			i, err := g.fileSystem.Lstat(p)
+			p := f.fileSystem.Join(d, i.Name())
+
+			i, err := f.fileSystem.Lstat(p)
 			if err != nil {
 				return nil, err
 			} else if i.IsDir() {
@@ -38,30 +59,5 @@ func (g *fileFinder) Find(d string, ignoreUntracked bool) ([]string, error) {
 		}
 	}
 
-	rps, err := g.repositoryPathFinder.Find(d, ignoreUntracked)
-	if err != nil {
-		return nil, err
-	} else if len(rps) == 0 {
-		return fs, nil
-	}
-
-	return intersectStringSets(fs, rps), nil
-}
-
-func intersectStringSets(ss, sss []string) []string {
-	sm := make(map[string]struct{}, len(ss))
-
-	for _, s := range ss {
-		sm[s] = struct{}{}
-	}
-
-	ss = make([]string, 0, len(sm))
-
-	for _, s := range sss {
-		if _, ok := sm[s]; ok {
-			ss = append(ss, s)
-		}
-	}
-
-	return ss
+	return fs, nil
 }
