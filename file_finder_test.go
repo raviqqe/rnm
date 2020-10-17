@@ -88,10 +88,14 @@ func TestFileFinderFindFileInHiddenDirectory(t *testing.T) {
 
 func TestFileFinderDoNotFindExcludedFile(t *testing.T) {
 	fs := memfs.New()
+
 	_, err := fs.Create("foo")
+	assert.Nil(t, err)
+
+	_, err = fs.Create("bar")
 	assert.Nil(t, err)
 
 	ss, err := newTestFileFinder(fs).Find(".", regexp.MustCompile("foo"), false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, normalizePaths(ss))
+	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
 }
