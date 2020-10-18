@@ -36,10 +36,15 @@ func (c *command) Run(ss []string) error {
 		return nil
 	}
 
-	r := newBareTextRenamer(args.From, args.To)
+	r, err := newCaseTextRenamer(args.From, args.To, args.CaseNames)
+	if err != nil {
+		return err
+	}
 
-	if !args.Bare {
-		r, err = newCaseTextRenamer(args.From, args.To, args.CaseNames)
+	if args.Bare {
+		r = newBareTextRenamer(args.From, args.To)
+	} else if args.Regexp {
+		r, err = newRegexpTextRenamer(args.From, args.To)
 		if err != nil {
 			return err
 		}

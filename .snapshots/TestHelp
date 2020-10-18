@@ -3,6 +3,7 @@ Usage:
 
 Application Options:
   -b, --bare        Use patterns as they are
+  -r, --regexp      Use patterns as regular expressions
   -c, --cases=      Comma-separated names of enabled case styles (options:
                     camel, upper-camel, kebab, upper-kebab, snake, upper-snake,
                     space, upper-space)
