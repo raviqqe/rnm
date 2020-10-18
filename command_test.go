@@ -63,7 +63,7 @@ func TestCommandVersion(t *testing.T) {
 	)
 }
 
-func TestCommandRun(t *testing.T) {
+func TestCommandRenameWithoutPathOption(t *testing.T) {
 	fs := memfs.New()
 	err := util.WriteFile(fs, "foo", []byte("foo"), 0o444)
 	assert.Nil(t, err)
@@ -195,4 +195,22 @@ func TestCommandRenameInDirectoryWithFileSpecified(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
+}
+
+func TestCommandRenameWithRegularExpression(t *testing.T) {
+	fs := memfs.New()
+
+	err := util.WriteFile(fs, "foo", []byte("foo"), 0o444)
+	assert.Nil(t, err)
+
+	err = newTestCommand(fs, ".").Run([]string{"-r", "(f.)o", "${1}e"})
+	assert.Nil(t, err)
+
+	f, err := fs.Open("foe")
+	assert.Nil(t, err)
+
+	bs, err := ioutil.ReadAll(f)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "foe", string(bs))
 }
