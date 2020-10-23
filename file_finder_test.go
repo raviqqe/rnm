@@ -54,7 +54,7 @@ func TestFileFinderFindRecursively(t *testing.T) {
 	assert.Equal(t, []string{"foo/foo"}, normalizePaths(ss))
 }
 
-func TestFileFinderIncludePathsNotIncludedInRepository(t *testing.T) {
+func TestFileFinderDoNotIncludePathsNotIncludedInRepository(t *testing.T) {
 	fs := memfs.New()
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
@@ -63,7 +63,7 @@ func TestFileFinderIncludePathsNotIncludedInRepository(t *testing.T) {
 
 	ss, err := newTestFileFinder(fs).Find(".", nil, false)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"bar", "foo"}, normalizePaths(ss))
+	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
 }
 
 func TestFileFinderIgnoreGitRepositoryInformation(t *testing.T) {
