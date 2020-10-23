@@ -74,20 +74,6 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
-	w, err := r.Worktree()
-	if err != nil {
-		return nil, err
-	}
-
-	st, err := w.Status()
-	if err != nil {
-		return nil, err
-	}
-
-	for p := range st {
-		ps = append(ps, f.fileSystem.Join(wd, p))
-	}
-
 	pps := make([]string, 0, len(ps))
 
 	for _, p := range ps {
