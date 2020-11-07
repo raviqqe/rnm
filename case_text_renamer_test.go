@@ -99,3 +99,10 @@ func TestCaseTextRenamerReplaceWithPatternIncludingRegexpCharacter(t *testing.T)
 
 	assert.Equal(t, "\\", r.Rename("foo"))
 }
+
+func TestCaseTextRenamerReplaceWithPluralPattern(t *testing.T) {
+	r, err := newCaseTextRenamer("apples", "orange", nil)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "orange", r.Rename("apples"))
+}
