@@ -14,7 +14,7 @@ func compilePatterns(from string, to string, cs map[caseName]struct{}) ([]*patte
 
 	for _, c := range caseConfigurations {
 		if _, ok := cs[c.name]; ok {
-			p, err := compilePattern(from, to, c)
+			p, err := newPattern(from, to, c)
 			if err != nil {
 				return nil, err
 			}
@@ -26,7 +26,7 @@ func compilePatterns(from string, to string, cs map[caseName]struct{}) ([]*patte
 	return ps, nil
 }
 
-func compilePattern(from string, to string, c *caseConfiguration) (*pattern, error) {
+func newPattern(from string, to string, c *caseConfiguration) (*pattern, error) {
 	r, err := regexp.Compile(
 		compileDelimiter(c.head, true) +
 			fallbackToBarePattern(c.convert, from) +
@@ -45,4 +45,8 @@ func fallbackToBarePattern(f func(string) string, s string) string {
 		converted = s
 	}
 	return converted
+}
+
+func (p *pattern) Replace(s string) string {
+	return p.From.ReplaceAllString(s, p.To)
 }
