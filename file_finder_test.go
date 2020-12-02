@@ -29,7 +29,7 @@ func TestFileFinderFindFile(t *testing.T) {
 	_, err := fs.Create("foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo"}, ss)
 }
@@ -39,7 +39,7 @@ func TestFileFinderDoNotFindDirectory(t *testing.T) {
 	err := fs.MkdirAll("foo", 0o755)
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
 }
@@ -49,7 +49,7 @@ func TestFileFinderFindRecursively(t *testing.T) {
 	_, err := fs.Create("foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"foo/foo"}, normalizePaths(ss))
 }
@@ -61,7 +61,7 @@ func TestFileFinderDoNotIncludePathsNotIncludedInRepository(t *testing.T) {
 
 	commitFiles(t, fs, []string{"bar"})
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
 }
@@ -71,7 +71,7 @@ func TestFileFinderIgnoreGitRepositoryInformation(t *testing.T) {
 
 	commitFiles(t, fs, []string{".foo"})
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, true)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, true)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, normalizePaths(ss))
 }
@@ -81,7 +81,7 @@ func TestFileFinderDoNotFindHiddenFile(t *testing.T) {
 	_, err := fs.Create(".foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{}, ss)
 }
@@ -91,9 +91,23 @@ func TestFileFinderFindFileInHiddenDirectory(t *testing.T) {
 	_, err := fs.Create(".foo/foo")
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".foo", nil, false)
+	ss, err := newTestFileFinder(fs).Find(".foo", nil, nil, false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{".foo/foo"}, normalizePaths(ss))
+}
+
+func TestFileFinderDoNotFindIncludedFile(t *testing.T) {
+	fs := memfs.New()
+
+	_, err := fs.Create("foo")
+	assert.Nil(t, err)
+
+	_, err = fs.Create("bar")
+	assert.Nil(t, err)
+
+	ss, err := newTestFileFinder(fs).Find(".", regexp.MustCompile("foo"), nil, false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"foo"}, normalizePaths(ss))
 }
 
 func TestFileFinderDoNotFindExcludedFile(t *testing.T) {
@@ -105,7 +119,7 @@ func TestFileFinderDoNotFindExcludedFile(t *testing.T) {
 	_, err = fs.Create("bar")
 	assert.Nil(t, err)
 
-	ss, err := newTestFileFinder(fs).Find(".", regexp.MustCompile("foo"), false)
+	ss, err := newTestFileFinder(fs).Find(".", nil, regexp.MustCompile("foo"), false)
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
 }

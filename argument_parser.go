@@ -17,6 +17,7 @@ type arguments struct {
 	Bare         bool   `short:"b" long:"bare" description:"Use patterns as they are"`
 	Regexp       bool   `short:"r" long:"regexp" description:"Use patterns as regular expressions"`
 	RawCaseNames string `short:"c" long:"cases" description:"Comma-separated names of enabled case styles (options: camel, upper-camel, kebab, upper-kebab, snake, upper-snake, space, upper-space)"`
+	RawInclude   string `short:"i" long:"include" description:"Include paths matched with the given regular expression"`
 	RawExclude   string `short:"e" long:"exclude" description:"Exclude paths matched with the given regular expression"`
 	IgnoreGit    bool   `long:"ignore-git" description:"Ignore Git repository information"`
 	Verbose      bool   `short:"v" long:"verbose" description:"Be verbose"`
@@ -26,6 +27,7 @@ type arguments struct {
 	To           string
 	Path         string
 	CaseNames    map[caseName]struct{}
+	Include      *regexp.Regexp
 	Exclude      *regexp.Regexp
 }
 
@@ -70,6 +72,13 @@ func (p *argumentParser) Parse(ss []string) (*arguments, error) {
 			}
 
 			args.CaseNames[n] = struct{}{}
+		}
+	}
+
+	if args.RawInclude != "" {
+		args.Include, err = regexp.Compile(args.RawInclude)
+		if err != nil {
+			return nil, err
 		}
 	}
 

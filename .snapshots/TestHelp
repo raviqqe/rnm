@@ -7,6 +7,7 @@ Application Options:
   -c, --cases=      Comma-separated names of enabled case styles (options:
                     camel, upper-camel, kebab, upper-kebab, snake, upper-snake,
                     space, upper-space)
+  -i, --include=    Include paths matched with the given regular expression
   -e, --exclude=    Exclude paths matched with the given regular expression
       --ignore-git  Ignore Git repository information
   -v, --verbose     Be verbose

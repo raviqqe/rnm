@@ -18,6 +18,8 @@ func TestParseArguments(t *testing.T) {
 		{"-c", "camel", "foo", "bar"},
 		{"--cases", "camel", "foo", "bar"},
 		{"-c", "camel,kebab", "foo", "bar"},
+		{"-i", "foo", "foo", "bar"},
+		{"--include", "foo", "foo", "bar"},
 		{"-e", "foo", "foo", "bar"},
 		{"--exclude", "foo", "foo", "bar"},
 		{"--ignore-git", "foo", "bar"},
@@ -38,6 +40,7 @@ func TestParseArgumentsError(t *testing.T) {
 		{"foo"},
 		{"foo", "bar", "baz", "blah"},
 		{"-c", "caml", "foo", "bar"},
+		{"--include", "(", "foo", "bar"},
 		{"--exclude", "(", "foo", "bar"},
 	} {
 		_, err := newArgumentParser(".").Parse(ss)
