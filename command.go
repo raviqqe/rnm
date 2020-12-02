@@ -63,7 +63,12 @@ func (c *command) Run(ss []string) error {
 		)
 	}
 
-	ss, err = c.fileFinder.Find(args.Path, args.Exclude, args.IgnoreGit)
+	ss, err = c.fileFinder.Find(
+		args.Path,
+		args.Include,
+		args.Exclude,
+		args.IgnoreGit,
+	)
 	if err != nil {
 		return err
 	}

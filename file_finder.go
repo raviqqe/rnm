@@ -17,20 +17,24 @@ func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
-func (f *fileFinder) Find(d string, excludedPattern *regexp.Regexp, ignoreGit bool) ([]string, error) {
+func (f *fileFinder) Find(d string, includedPattern, excludedPattern *regexp.Regexp, ignoreGit bool) ([]string, error) {
 	fs, err := f.findFiles(d, ignoreGit)
 	if err != nil {
 		return nil, err
-	} else if excludedPattern == nil {
-		return fs, nil
 	}
 
 	ffs := make([]string, 0, len(fs))
 
 	for _, f := range fs {
-		if !excludedPattern.MatchString(f) {
-			ffs = append(ffs, f)
+		if includedPattern != nil &&
+			!includedPattern.MatchString(f) {
+			continue
+		} else if excludedPattern != nil &&
+			excludedPattern.MatchString(f) {
+			continue
 		}
+
+		ffs = append(ffs, f)
 	}
 
 	return ffs, nil
