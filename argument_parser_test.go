@@ -40,6 +40,7 @@ func TestParseArgumentsError(t *testing.T) {
 		{"foo"},
 		{"foo", "bar", "baz", "blah"},
 		{"-c", "caml", "foo", "bar"},
+		{"--include", "(", "foo", "bar"},
 		{"--exclude", "(", "foo", "bar"},
 	} {
 		_, err := newArgumentParser(".").Parse(ss)

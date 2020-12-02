@@ -27,6 +27,7 @@ type arguments struct {
 	To           string
 	Path         string
 	CaseNames    map[caseName]struct{}
+	Include      *regexp.Regexp
 	Exclude      *regexp.Regexp
 }
 
@@ -71,6 +72,13 @@ func (p *argumentParser) Parse(ss []string) (*arguments, error) {
 			}
 
 			args.CaseNames[n] = struct{}{}
+		}
+	}
+
+	if args.RawInclude != "" {
+		args.Include, err = regexp.Compile(args.RawInclude)
+		if err != nil {
+			return nil, err
 		}
 	}
 
