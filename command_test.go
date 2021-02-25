@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"testing"
@@ -17,10 +16,10 @@ func newTestCommand(fs billy.Filesystem, d string) *command {
 	return newCommand(
 		newArgumentParser(d),
 		newFileFinder(newRepositoryFileFinder(fs), fs),
-		newFileRenamer(fs, ioutil.Discard),
+		newFileRenamer(fs, io.Discard),
 		fs,
-		ioutil.Discard,
-		ioutil.Discard,
+		io.Discard,
+		io.Discard,
 	)
 }
 
@@ -31,10 +30,10 @@ func TestCommandHelp(t *testing.T) {
 	err := newCommand(
 		newArgumentParser("."),
 		newFileFinder(newRepositoryFileFinder(fs), fs),
-		newFileRenamer(fs, ioutil.Discard),
+		newFileRenamer(fs, io.Discard),
 		fs,
 		b,
-		ioutil.Discard,
+		io.Discard,
 	).Run([]string{"--help"})
 	assert.Nil(t, err)
 
@@ -48,10 +47,10 @@ func TestCommandVersion(t *testing.T) {
 	err := newCommand(
 		newArgumentParser("."),
 		newFileFinder(newRepositoryFileFinder(fs), fs),
-		newFileRenamer(fs, ioutil.Discard),
+		newFileRenamer(fs, io.Discard),
 		fs,
 		b,
-		ioutil.Discard,
+		io.Discard,
 	).Run([]string{"--version"})
 	assert.Nil(t, err)
 
@@ -74,7 +73,7 @@ func TestCommandRenameWithoutPathOption(t *testing.T) {
 	f, err := fs.Open("bar")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
@@ -94,7 +93,7 @@ func TestCommandRenameOnlyFile(t *testing.T) {
 	f, err := fs.Open("foo")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "blah", string(bs))
@@ -102,7 +101,7 @@ func TestCommandRenameOnlyFile(t *testing.T) {
 	f, err = fs.Open("bar")
 	assert.Nil(t, err)
 
-	bs, err = ioutil.ReadAll(f)
+	bs, err = io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "baz", string(bs))
@@ -126,7 +125,7 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 	f, err := fs.Open("foo/foo")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "blah", string(bs))
@@ -134,7 +133,7 @@ func TestCommandRenameOnlyDirectory(t *testing.T) {
 	f, err = fs.Open("bar")
 	assert.Nil(t, err)
 
-	bs, err = ioutil.ReadAll(f)
+	bs, err = io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "baz", string(bs))
@@ -151,7 +150,7 @@ func TestCommandRenameWithBarePattern(t *testing.T) {
 	f, err := fs.Open("foo")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar()", string(bs))
@@ -171,7 +170,7 @@ func TestCommandRenameInDirectory(t *testing.T) {
 	f, err := fs.Open("foo/bar")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
@@ -191,7 +190,7 @@ func TestCommandRenameInDirectoryWithFileSpecified(t *testing.T) {
 	f, err := fs.Open("foo/bar")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
@@ -209,7 +208,7 @@ func TestCommandRenameWithRegularExpression(t *testing.T) {
 	f, err := fs.Open("foe")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "foe", string(bs))
