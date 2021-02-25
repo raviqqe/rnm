@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"io/io"
+	"io"
 	"os"
 	"runtime"
 	"testing"
