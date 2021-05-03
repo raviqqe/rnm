@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
-	github.com/go-git/go-billy/v5 v5.2.0
+	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/h2non/filetype v1.1.1
 	github.com/iancoleman/strcase v0.1.3
