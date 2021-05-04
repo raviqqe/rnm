@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"io"
 	"regexp"
 	"strings"
 	"testing"
