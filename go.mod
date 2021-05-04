@@ -1,6 +1,6 @@
 module github.com/raviqqe/rnm
 
-go 1.15
+go 1.16
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
