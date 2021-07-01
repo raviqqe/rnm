@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"os"
 	"runtime"
 	"testing"
@@ -22,13 +22,13 @@ func TestFileRenamerRenameFileShrinkingAfterRenaming(t *testing.T) {
 	tr, err := newCaseTextRenamer("bar baz", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", false)
+	err = newFileRenamer(fs, io.Discard).Rename(tr, "foo", ".", false)
 	assert.Nil(t, err)
 
 	f, err := fs.Open("foo")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
@@ -66,7 +66,7 @@ func TestFileRenamerRenameSymlinkToFile(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
+	err = newFileRenamer(fs, io.Discard).Rename(tr, "foo", ".", true)
 	assert.Nil(t, err)
 
 	i, err := fs.Lstat("bar")
@@ -77,7 +77,7 @@ func TestFileRenamerRenameSymlinkToFile(t *testing.T) {
 	f, err := fs.Open("bar")
 	assert.Nil(t, err)
 
-	bs, err := ioutil.ReadAll(f)
+	bs, err := io.ReadAll(f)
 	assert.Nil(t, err)
 
 	assert.Equal(t, "bar", string(bs))
@@ -92,7 +92,7 @@ func TestFileRenamerFailToRenameDirectory(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
+	err = newFileRenamer(fs, io.Discard).Rename(tr, "foo", ".", true)
 	assert.Error(t, err)
 }
 
@@ -108,7 +108,7 @@ func TestFileRenamerFailToRenameSymlinkToDirectory(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo", ".", true)
+	err = newFileRenamer(fs, io.Discard).Rename(tr, "foo", ".", true)
 	assert.Error(t, err)
 }
 
@@ -124,7 +124,7 @@ func TestFileRenamerFileInDirectory(t *testing.T) {
 	tr, err := newCaseTextRenamer("foo", "bar", nil)
 	assert.Nil(t, err)
 
-	err = newFileRenamer(fs, ioutil.Discard).Rename(tr, "foo/foo", "foo", true)
+	err = newFileRenamer(fs, io.Discard).Rename(tr, "foo/foo", "foo", true)
 	assert.Nil(t, err)
 
 	_, err = fs.Lstat("foo/bar")
