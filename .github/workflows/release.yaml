@@ -11,6 +11,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17.0
       - run: |
           version=v$(go run . --version)
 
