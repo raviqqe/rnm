@@ -57,7 +57,7 @@ var caseConfigurations = []*caseConfiguration{
 	{
 		upperSpace,
 		func(s string) string {
-			return strcase.ToScreamingDelimited(s, ' ', 0, true)
+			return strcase.ToScreamingDelimited(s, ' ', "", true)
 		},
 		nonAlphabet,
 		nonAlphabet,
