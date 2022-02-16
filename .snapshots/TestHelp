@@ -9,7 +9,7 @@ Application Options:
                     space, upper-space)
   -i, --include=    Include paths matched with the given regular expression
   -e, --exclude=    Exclude paths matched with the given regular expression
-      --ignore-git  Ignore Git repository information
+      --no-git  Ignore Git repository information
   -v, --verbose     Be verbose
   -h, --help        Show this help
       --version     Show version
