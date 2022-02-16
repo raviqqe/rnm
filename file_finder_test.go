@@ -123,3 +123,22 @@ func TestFileFinderDoNotFindExcludedFile(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
 }
+
+func TestFileFinderDoNotFindFileInGitIgnore(t *testing.T) {
+	fs := memfs.New()
+
+	f, err := fs.Create(".gitignore")
+	assert.Nil(t, err)
+	_, err = f.Write(([]byte)("foo"))
+	assert.Nil(t, err)
+
+	_, err = fs.Create("foo")
+	assert.Nil(t, err)
+
+	_, err = fs.Create("bar")
+	assert.Nil(t, err)
+
+	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"bar"}, normalizePaths(ss))
+}
