@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+	"path"
 	"regexp"
 
 	"github.com/go-git/go-billy/v5"
@@ -57,6 +59,13 @@ func (f *fileFinder) findFilesOutsideRepository(d string) ([]string, error) {
 	fs := []string{}
 	ds := []string{d}
 
+	s, err := f.readGitIgnore(d)
+	if err != nil {
+		return nil, err
+	}
+
+	g := NewGitIgnore(s)
+
 	for len(ds) != 0 {
 		d := ds[0]
 		ds = ds[1:]
@@ -78,11 +87,25 @@ func (f *fileFinder) findFilesOutsideRepository(d string) ([]string, error) {
 				return nil, err
 			} else if i.IsDir() {
 				ds = append(ds, p)
-			} else {
+			} else if !g.Ignore(p) {
 				fs = append(fs, p)
 			}
 		}
 	}
 
 	return fs, nil
+}
+
+func (f *fileFinder) readGitIgnore(d string) (string, error) {
+	ff, err := f.fileSystem.Open(path.Join(d, ".gitignore"))
+	if err != nil {
+		return "", nil
+	}
+
+	bs, err := io.ReadAll(ff)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bs), nil
 }
