@@ -22,7 +22,7 @@ func TestParseArguments(t *testing.T) {
 		{"--include", "foo", "foo", "bar"},
 		{"-e", "foo", "foo", "bar"},
 		{"--exclude", "foo", "foo", "bar"},
-		{"--ignore-git", "foo", "bar"},
+		{"--no-git", "foo", "bar"},
 		{"-v", "foo", "bar"},
 		{"--verbose", "foo", "bar"},
 		{"-h"},
