@@ -67,7 +67,7 @@ func (c *command) Run(ss []string) error {
 		args.Path,
 		args.Include,
 		args.Exclude,
-		args.IgnoreGit,
+		args.NoGit,
 	)
 	if err != nil {
 		return err

@@ -17,8 +17,8 @@ func newFileFinder(f *repositoryFileFinder, fs billy.Filesystem) *fileFinder {
 	return &fileFinder{f, fs}
 }
 
-func (f *fileFinder) Find(d string, includedPattern, excludedPattern *regexp.Regexp, ignoreGit bool) ([]string, error) {
-	fs, err := f.findFiles(d, ignoreGit)
+func (f *fileFinder) Find(d string, includedPattern, excludedPattern *regexp.Regexp, noGit bool) ([]string, error) {
+	fs, err := f.findFiles(d, noGit)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +40,8 @@ func (f *fileFinder) Find(d string, includedPattern, excludedPattern *regexp.Reg
 	return ffs, nil
 }
 
-func (f *fileFinder) findFiles(d string, ignoreGit bool) ([]string, error) {
-	if !ignoreGit {
+func (f *fileFinder) findFiles(d string, noGit bool) ([]string, error) {
+	if !noGit {
 		fs, err := f.repositoryFileFinder.Find(d)
 		if err != nil {
 			return nil, err
