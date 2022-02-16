@@ -14,6 +14,6 @@ func NewGitIgnore(source string) *GitIgnore {
 	return &GitIgnore{ignore.CompileIgnoreLines(strings.Split(source, "\n")...)}
 }
 
-func (*GitIgnore) Ignore(path string) bool {
-	return true
+func (i *GitIgnore) Ignore(path string) bool {
+	return i.ignore.MatchesPath(path)
 }
