@@ -1,6 +1,6 @@
 # rnm
 
-[![GitHub Action](https://img.shields.io/github/workflow/status/raviqqe/rnm/test?style=flat-square)](https://github.com/raviqqe/rnm/actions)
+[![GitHub Action](https://img.shields.io/github/actions/workflow/status/raviqqe/rnm/test.yaml?branch=main&style=flat-square)](https://github.com/raviqqe/rnm/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/raviqqe/rnm.svg?style=flat-square)](https://codecov.io/gh/raviqqe/rnm)
 [![License](https://img.shields.io/github/license/raviqqe/rnm.svg?style=flat-square)](LICENSE)
 
