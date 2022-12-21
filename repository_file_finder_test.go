@@ -48,7 +48,7 @@ func TestRepositoryFileFinderFindNoPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, ss)
+	assert.Nil(t, ss)
 }
 
 func TestRepositoryFileFinderFindCommittedPath(t *testing.T) {
@@ -69,7 +69,7 @@ func TestRepositoryFileFinderDoNotFindUncommittedPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, ss)
+	assert.Nil(t, ss)
 }
 
 func TestRepositoryFileFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
@@ -84,7 +84,7 @@ func TestRepositoryFileFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, ss)
+	assert.Nil(t, ss)
 }
 
 func TestRepositoryFileFinderFindPathInsideDirectory(t *testing.T) {
@@ -110,7 +110,7 @@ func TestRepositoryFileFinderDoNotFindPathOutsideDirectory(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find("bar")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, normalizePaths(ss))
+	assert.Nil(t, normalizePaths(ss))
 }
 
 func TestRepositoryFileFinderDoNotFindUncommittedPathInsideDirectory(t *testing.T) {
@@ -126,7 +126,7 @@ func TestRepositoryFileFinderDoNotFindUncommittedPathInsideDirectory(t *testing.
 
 	ss, err := newRepositoryFileFinder(fs).Find("bar")
 	assert.Nil(t, err)
-	assert.Equal(t, []string{}, normalizePaths(ss))
+	assert.Nil(t, normalizePaths(ss))
 }
 
 func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
