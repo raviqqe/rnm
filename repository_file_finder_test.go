@@ -2,14 +2,12 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,13 +30,7 @@ func commitFiles(t *testing.T, fs billy.Filesystem, paths []string) {
 		assert.Nil(t, err)
 	}
 
-	_, err = w.Commit("foo", &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  "",
-			Email: "",
-			When:  time.Now(),
-		},
-	})
+	_, err = w.Commit("foo", &git.CommitOptions{AllowEmptyCommits: true})
 	assert.Nil(t, err)
 }
 
@@ -48,7 +40,7 @@ func TestRepositoryFileFinderFindNoPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Nil(t, ss)
+	assert.Equal(t, []string{}, ss)
 }
 
 func TestRepositoryFileFinderFindCommittedPath(t *testing.T) {
@@ -69,7 +61,7 @@ func TestRepositoryFileFinderDoNotFindUncommittedPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Nil(t, ss)
+	assert.Equal(t, []string{}, ss)
 }
 
 func TestRepositoryFileFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
@@ -84,7 +76,7 @@ func TestRepositoryFileFinderDoNotFindIgnoredUncommittedPath(t *testing.T) {
 
 	ss, err := newRepositoryFileFinder(fs).Find(".")
 	assert.Nil(t, err)
-	assert.Nil(t, ss)
+	assert.Equal(t, []string{}, ss)
 }
 
 func TestRepositoryFileFinderFindPathInsideDirectory(t *testing.T) {
@@ -126,7 +118,7 @@ func TestRepositoryFileFinderDoNotFindUncommittedPathInsideDirectory(t *testing.
 
 	ss, err := newRepositoryFileFinder(fs).Find("bar")
 	assert.Nil(t, err)
-	assert.Nil(t, normalizePaths(ss))
+	assert.Equal(t, []string{}, normalizePaths(ss))
 }
 
 func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
