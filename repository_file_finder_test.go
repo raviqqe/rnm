@@ -8,6 +8,7 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +31,10 @@ func commitFiles(t *testing.T, fs billy.Filesystem, paths []string) {
 		assert.Nil(t, err)
 	}
 
-	_, err = w.Commit("foo", &git.CommitOptions{AllowEmptyCommits: true})
+	_, err = w.Commit("foo", &git.CommitOptions{
+		AllowEmptyCommits: true,
+		Author:            &object.Signature{},
+	})
 	assert.Nil(t, err)
 }
 
