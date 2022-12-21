@@ -4,7 +4,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/raviqqe/rnm.svg?style=flat-square)](https://codecov.io/gh/raviqqe/rnm)
 [![License](https://img.shields.io/github/license/raviqqe/rnm.svg?style=flat-square)](LICENSE)
 
-Yet another [`codemod`](https://github.com/facebook/codemod) alternative.
+Yet another [`fastmod`](https://github.com/facebookincubator/fastmod) alternative.
 
 Replace all occurrences of a name to another name in your code!
 
