@@ -41,7 +41,7 @@ func TestFileFinderDoNotFindDirectory(t *testing.T) {
 
 	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)
 	assert.Nil(t, err)
-	assert.Nil(t, ss)
+	assert.Equal(t, []string{}, ss)
 }
 
 func TestFileFinderFindRecursively(t *testing.T) {
