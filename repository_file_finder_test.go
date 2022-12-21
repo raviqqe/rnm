@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
@@ -33,11 +32,8 @@ func commitFiles(t *testing.T, fs billy.Filesystem, paths []string) {
 	}
 
 	_, err = w.Commit("foo", &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  "",
-			Email: "",
-			When:  time.Now(),
-		},
+		AllowEmptyCommits: true,
+		Author:            &object.Signature{},
 	})
 	assert.Nil(t, err)
 }
