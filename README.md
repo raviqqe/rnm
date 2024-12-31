@@ -6,7 +6,7 @@
 
 Yet another [`fastmod`](https://github.com/facebookincubator/fastmod) alternative.
 
-Replace all occurrences of a name to another name in your code!
+Replace all occurrences of a name to another name in `{camel,kebab,shout,snake,...}`cases in your codes!
 
 ## Features
 
