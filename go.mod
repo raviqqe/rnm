@@ -1,6 +1,9 @@
 module github.com/raviqqe/rnm
 
-go 1.23
+go 1.23.0
+
+toolchain go1.24.0
+
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
 	github.com/go-git/go-billy/v5 v5.6.2
