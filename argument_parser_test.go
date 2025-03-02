@@ -48,6 +48,13 @@ func TestParseArgumentsError(t *testing.T) {
 	}
 }
 
+func TestParseArgumentsQuotedStrings(t *testing.T) {
+	args, err := newArgumentParser(".").Parse([]string{"\n", "\n"})
+	assert.Nil(t, err)
+	assert.Equal(t, "\n", args.From)
+	assert.Equal(t, "\n", args.To)
+}
+
 func TestParseArgumentsResolvingPath(t *testing.T) {
 	args, err := newArgumentParser("foo").Parse([]string{"foo", "foo", "bar"})
 	assert.Nil(t, err)
