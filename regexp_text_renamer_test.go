@@ -31,3 +31,10 @@ func TestRegexpRenamerRenameWithPlaceholder(t *testing.T) {
 
 	assert.Equal(t, "(foo)", r.Rename("foo"))
 }
+
+func TestRegexpRenamerRenameNewline(t *testing.T) {
+	r, err := newRegexpTextRenamer("a", "\n")
+	assert.Nil(t, err)
+
+	assert.Equal(t, "\n", r.Rename("a"))
+}
