@@ -36,6 +36,9 @@ func main() {
 }
 
 func fail(stderr io.Writer, err error) {
-	fmt.Fprintln(stderr, aurora.Red(err))
+	if _, err := fmt.Fprintln(stderr, aurora.Red(err)); err != nil {
+		panic(err)
+	}
+
 	os.Exit(1)
 }

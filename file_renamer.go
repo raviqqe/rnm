@@ -53,7 +53,11 @@ func (r *fileRenamer) Rename(tr textRenamer, path string, baseDir string, verbos
 		return err
 	}
 
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	bs, err := io.ReadAll(f)
 	if err != nil {
@@ -92,7 +96,11 @@ func (r *fileRenamer) isTextFile(path string) (bool, error) {
 		return false, err
 	}
 
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	bs := make([]byte, fileTypeDetectionBufferSize)
 	_, err = f.Read(bs)

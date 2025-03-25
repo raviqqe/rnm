@@ -29,11 +29,11 @@ func (c *command) Run(ss []string) error {
 	if err != nil {
 		return err
 	} else if args.Help {
-		fmt.Fprint(c.stdout, c.argumentParser.Help())
-		return nil
+		_, err := fmt.Fprint(c.stdout, c.argumentParser.Help())
+		return err
 	} else if args.Version {
-		fmt.Fprintln(c.stdout, version)
-		return nil
+		_, err := fmt.Fprintln(c.stdout, version)
+		return err
 	}
 
 	r, err := newCaseTextRenamer(args.From, args.To, args.CaseNames)
@@ -103,7 +103,9 @@ func (c *command) Run(ss []string) error {
 	for err := range ec {
 		ok = false
 
-		c.printError(err)
+		if err := c.printError(err); err != nil {
+			return err
+		}
 	}
 
 	if !ok {
@@ -113,6 +115,7 @@ func (c *command) Run(ss []string) error {
 	return nil
 }
 
-func (c *command) printError(err error) {
-	fmt.Fprintln(c.stderr, aurora.Red(err))
+func (c *command) printError(err error) error {
+	_, err = fmt.Fprintln(c.stderr, aurora.Red(err))
+	return err
 }
