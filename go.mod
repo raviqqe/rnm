@@ -14,7 +14,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/mattn/go-colorable v0.1.14
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
