@@ -18,7 +18,7 @@ jobs:
         with:
           go-version: ^1.23.4
       - run: go build
-      - uses: golangci/golangci-lint-action@v8
+      - uses: golangci/golangci-lint-action@v9
         with:
           args: --timeout 5m
       - run: go test -covermode atomic -coverprofile coverage.txt
