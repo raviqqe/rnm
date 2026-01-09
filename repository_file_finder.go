@@ -137,7 +137,7 @@ func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
 
 	c := strings.TrimSpace(string(bs))
 	if c == "" {
-		return "", fmt.Errorf("empty commondir file: %v", p)
+		return "", fmt.Errorf("invalid commondir file: %v", p)
 	}
 
 	return f.resolvePath(d, c), nil
