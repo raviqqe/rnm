@@ -77,7 +77,8 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 		return nil, "", nil
 	}
 
-	wfs, err := f.fileSystem.Chroot(filepath.Dir(rd))
+	wd := filepath.Dir(rd)
+	wfs, err := f.fileSystem.Chroot(wd)
 	if err != nil {
 		return nil, "", err
 	}
@@ -107,7 +108,7 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 		return nil, "", err
 	}
 
-	return r, wfs.Root(), nil
+	return r, wd, nil
 }
 
 func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileInfo) {
