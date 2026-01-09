@@ -19,7 +19,7 @@ Replace all occurrences of a name to another name in `{camel,kebab,shout,snake,.
 ## Install
 
 ```sh
-GO111MODULE=on go get -u github.com/raviqqe/rnm
+go install github.com/raviqqe/rnm@latest
 ```
 
 ## Usage
