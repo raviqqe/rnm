@@ -107,25 +107,6 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 }
 
 func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDirectory string) (string, error) {
-	file, err := f.fileSystem.Open(dotGitPath)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = file.Close() }()
-
-	b, err := io.ReadAll(file)
-	if err != nil {
-		return "", err
-	}
-
-	line := strings.Split(string(b), "\n")[0]
-	const prefix = "gitdir:"
-
-	if !strings.HasPrefix(line, prefix) {
-		return "", fmt.Errorf(".git file has no %s prefix: %v", prefix, dotGitPath)
-	}
-
-	d := strings.TrimSpace(line[len(prefix):])
 
 	if filepath.IsAbs(d) {
 		return filepath.Clean(d), nil
@@ -148,7 +129,20 @@ func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileI
 	}
 }
 
-func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
+func (f *repositoryFileFinder) findCommonDirectory(p string) (string, error) {
+	bs, err := util.ReadFile(f.fileSystem, p)
+	if err != nil {
+		return "", err
+	}
+
+	s := strings.Split(string(bs), "\n")[0]
+	const prefix = "gitdir:"
+
+	if !strings.HasPrefix(s, prefix) {
+		return "", fmt.Errorf(".git file has no %s prefix: %v", prefix, p)
+	}
+
+	d := strings.TrimSpace(s[len(prefix):])
 	p := f.fileSystem.Join(d, "commondir")
 	bs, err := util.ReadFile(f.fileSystem, p)
 	if err != nil {
