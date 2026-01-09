@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/go-git/go-billy/v5"
