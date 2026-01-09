@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/go-git/go-billy/v5"
@@ -198,7 +200,7 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *tes
 		fs,
 		"worktree/.git",
 		// An absolute `gitdir` path
-		[]byte("gitdir: /repository/.git/worktrees/0123\n"),
+		fmt.Appendf(nil, "gitdir: %s\n", filepath.FromSlash("/repository/.git/worktrees/0123")),
 		0o400,
 	)
 	assert.Nil(t, err)
@@ -207,7 +209,7 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *tes
 		fs,
 		// An absolute `commondir` path
 		"repository/.git/worktrees/0123/commondir",
-		[]byte("/repository/.git\n"),
+		[]byte(filepath.FromSlash("/repository/.git")),
 		0o400,
 	)
 	assert.Nil(t, err)
