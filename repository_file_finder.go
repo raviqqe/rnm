@@ -44,7 +44,7 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 			return nil, err
 		} else if i.IsDir() {
 			// Directories are meaningful only if they contain files in Git repositories.
-			// Hence, file renaming handles directory one implicitly.
+			// Hence, file renaming handles directories implicitly.
 			continue
 		}
 
