@@ -170,10 +170,44 @@ func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
+	_, err = fs.Create("worktree/foo")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryFileFinder(fs).Find("worktree")
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"worktree/foo"}, normalizePaths(ss))
+}
+
+func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *testing.T) {
+	fs := memfs.New()
+
+	err := fs.MkdirAll("repository", 0o700)
+	assert.Nil(t, err)
+
+	rfs, err := fs.Chroot("repository")
+	assert.Nil(t, err)
+	commitFiles(t, rfs, []string{"foo"})
+
+	err = fs.MkdirAll("worktree", 0o700)
+	assert.Nil(t, err)
+
+	err = fs.MkdirAll("repository/.git/worktrees/0123", 0o700)
+	assert.Nil(t, err)
+
 	err = util.WriteFile(
 		fs,
-		"repository/.git/worktrees/0123/HEAD",
-		[]byte("ref: refs/heads/master\n"),
+		"worktree/.git",
+		// An absolute `gitdir` path
+		[]byte("gitdir: /repository/.git/worktrees/0123\n"),
+		0o400,
+	)
+	assert.Nil(t, err)
+
+	err = util.WriteFile(
+		fs,
+		// An absolute `commondir` path
+		"repository/.git/worktrees/0123/commondir",
+		[]byte("/repository/.git\n"),
 		0o400,
 	)
 	assert.Nil(t, err)
