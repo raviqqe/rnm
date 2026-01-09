@@ -7,12 +7,14 @@
     "dotgit",
     "fastmod",
     "jessevdk",
+    "memfs",
     "nolint",
     "println",
     "raviqqe",
     "renamer",
     "stretchr",
     "struct",
-    "worktree"
+    "worktree",
+    "worktrees"
   ]
 }
