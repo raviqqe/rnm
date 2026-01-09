@@ -34,7 +34,7 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, nil
 	}
 
-	gfs, err := f.fileSystem.Chroot(rd)
+	rfs, err := f.fileSystem.Chroot(rd)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +44,12 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
-	repositoryFs := billy.Filesystem(gfs)
+	repositoryFs := billy.Filesystem(rfs)
 	commonFs, err := f.findCommonGitDirectory(rd)
 	if err != nil {
 		return nil, err
 	} else if commonFs != nil {
-		repositoryFs = dotgit.NewRepositoryFilesystem(gfs, commonFs)
+		repositoryFs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
 	}
 
 	r, err := git.Open(
