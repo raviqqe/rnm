@@ -34,12 +34,12 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, nil
 	}
 
-	rfs, err := f.fileSystem.Chroot(rd)
+	wfs, err := f.fileSystem.Chroot(wd)
 	if err != nil {
 		return nil, err
 	}
 
-	wfs, err := f.fileSystem.Chroot(wd)
+	rfs, err := f.fileSystem.Chroot(rd)
 	if err != nil {
 		return nil, err
 	}
