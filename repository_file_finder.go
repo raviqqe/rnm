@@ -71,12 +71,7 @@ func (f *repositoryFileFinder) openGitRepository(d string) (*git.Repository, str
 	}
 
 	if !i.IsDir() {
-		d, err := f.findWorktreeDataDirectory(rd)
-		if err != nil {
-			return nil, "", err
-		}
-
-		rd, err = f.findCommonDirectory(d)
+		rd, err = f.findWorktreeDataDirectory(rd)
 		if err != nil {
 			return nil, "", err
 		}
@@ -126,21 +121,6 @@ func (f *repositoryFileFinder) findWorktreeDataDirectory(p string) (string, erro
 	}
 
 	return f.resolvePath(filepath.Dir(p), strings.TrimSpace(s[len(prefix):])), nil
-}
-
-func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
-	p := f.fileSystem.Join(d, "commondir")
-	bs, err := util.ReadFile(f.fileSystem, p)
-	if err != nil {
-		return "", err
-	}
-
-	c := strings.TrimSpace(string(bs))
-	if c == "" {
-		return "", fmt.Errorf("invalid commondir file: %v", p)
-	}
-
-	return f.resolvePath(d, c), nil
 }
 
 func (f *repositoryFileFinder) resolvePath(d, p string) string {
