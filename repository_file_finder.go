@@ -11,7 +11,6 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
@@ -33,42 +32,33 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, nil
 	}
 
-	ref, err := r.Head()
-	if err != nil {
-		return nil, err
-	}
-
-	c, err := r.CommitObject(ref.Hash())
-	if err != nil {
-		return nil, err
-	}
-
-	i, err := c.Files()
+	i, err := r.Storer.Index()
 	if err != nil {
 		return nil, err
 	}
 
 	ps := []string{}
 
-	err = i.ForEach(func(file *object.File) error {
-		ps = append(ps, f.fileSystem.Join(wd, file.Name))
+	for _, e := range i.Entries {
+		p := f.fileSystem.Join(wd, e.Name)
 
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+		i, err := f.fileSystem.Lstat(p)
+		if err != nil {
+			return nil, err
+		} else if i.IsDir() {
+			// Directories are meaningful only if they contain files in Git repositories.
+			// Hence, file renaming handles directory one implicitly.
+			continue
+		}
 
-	pps := make([]string, 0, len(ps))
-
-	for _, p := range ps {
 		b, err := filepath.Rel(d, p)
+
 		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(b)) {
-			pps = append(pps, p)
+			ps = append(ps, p)
 		}
 	}
 
-	return pps, nil
+	return ps, nil
 }
 
 func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
