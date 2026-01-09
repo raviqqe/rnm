@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/go-git/go-billy/v5"
@@ -13,8 +12,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
-
-var parentDirectoryRegexp = regexp.MustCompile(`^\.\./`)
 
 type repositoryFileFinder struct {
 	fileSystem billy.Filesystem
@@ -53,7 +50,7 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 
 		b, err := filepath.Rel(d, p)
 
-		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(b)) {
+		if err == nil && !strings.HasPrefix(filepath.ToSlash(b), "../") {
 			ps = append(ps, p)
 		}
 	}
