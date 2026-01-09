@@ -73,20 +73,21 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 }
 
 func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
-	wd := f.findWorktreeDirectory(d)
-	if wd == "" {
+	rd, i := f.findWorktreeDirectory(d)
+	if rd == "" {
 		return nil, "", nil
 	}
 
-	if ;f.fileSystem.Join(wd, ".git") .IsDir() {
-	rd, err := f.findRepositoryDirectory(wd)
-	if err != nil {
-		return nil, err
-	}
-
-	wfs, err := f.fileSystem.Chroot(wd)
+	wfs, err := f.fileSystem.Chroot(filepath.Dir(rd))
 	if err != nil {
 		return nil, "", err
+	}
+
+	if !i.IsDir() {
+		rd, err := f.findRepositoryDirectory(rd)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	rfs, err := f.fileSystem.Chroot(rd)
