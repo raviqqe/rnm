@@ -27,14 +27,14 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string) ([]string, error) {
-	wd, gitDir, err := f.findWorktreeDirectory(d)
+	wd, rd, err := f.findWorktreeDirectory(d)
 	if err != nil {
 		return nil, err
 	} else if wd == "" {
 		return nil, nil
 	}
 
-	gfs, err := f.fileSystem.Chroot(gitDir)
+	gfs, err := f.fileSystem.Chroot(rd)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 	}
 
 	repositoryFs := billy.Filesystem(gfs)
-	commonFs, err := f.findCommonGitDirectory(gitDir)
+	commonFs, err := f.findCommonGitDirectory(rd)
 	if err != nil {
 		return nil, err
 	} else if commonFs != nil {
