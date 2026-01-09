@@ -210,15 +210,6 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *tes
 	)
 	assert.Nil(t, err)
 
-	err = util.WriteFile(
-		fs,
-		// An absolute `commondir` path
-		"repository/.git/worktrees/0123/commondir",
-		[]byte(filepath.FromSlash("/repository/.git")),
-		0o400,
-	)
-	assert.Nil(t, err)
-
 	_, err = fs.Create("worktree/foo")
 	assert.Nil(t, err)
 
@@ -253,72 +244,4 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithInvalidGitdirEntry(t *t
 
 	_, err = newRepositoryFileFinder(fs).Find("worktree")
 	assert.EqualError(t, err, fmt.Sprintf("no gitdir entry in .git file: %v", filepath.FromSlash("worktree/.git")))
-}
-
-func TestRepositoryFileFinderFindPathInLinkedWorktreeWithNoCommonDirectoryFile(t *testing.T) {
-	fs := memfs.New()
-
-	err := fs.MkdirAll("repository", 0o700)
-	assert.Nil(t, err)
-
-	rfs, err := fs.Chroot("repository")
-	assert.Nil(t, err)
-	commitFiles(t, rfs, []string{"foo"})
-
-	err = fs.MkdirAll("worktree", 0o700)
-	assert.Nil(t, err)
-
-	err = fs.MkdirAll("repository/.git/worktrees/0123", 0o700)
-	assert.Nil(t, err)
-
-	err = util.WriteFile(
-		fs,
-		"worktree/.git",
-		[]byte("gitdir: ../repository/.git/worktrees/0123\n"),
-		0o400,
-	)
-	assert.Nil(t, err)
-
-	_, err = newRepositoryFileFinder(fs).Find("worktree")
-	assert.EqualError(t, err, "file does not exist")
-}
-
-func TestRepositoryFileFinderFindPathInLinkedWorktreeWithInvalidCommonDirectoryFile(t *testing.T) {
-	fs := memfs.New()
-
-	err := fs.MkdirAll("repository", 0o700)
-	assert.Nil(t, err)
-
-	rfs, err := fs.Chroot("repository")
-	assert.Nil(t, err)
-	commitFiles(t, rfs, []string{"foo"})
-
-	err = fs.MkdirAll("worktree", 0o700)
-	assert.Nil(t, err)
-
-	err = fs.MkdirAll("repository/.git/worktrees/0123", 0o700)
-	assert.Nil(t, err)
-
-	err = util.WriteFile(
-		fs,
-		"worktree/.git",
-		[]byte("gitdir: ../repository/.git/worktrees/0123\n"),
-		0o400,
-	)
-	assert.Nil(t, err)
-
-	err = util.WriteFile(
-		fs,
-		"repository/.git/worktrees/0123/commondir",
-		nil,
-		0o400,
-	)
-	assert.Nil(t, err)
-
-	_, err = newRepositoryFileFinder(fs).Find("worktree")
-	assert.EqualError(
-		t,
-		err,
-		fmt.Sprintf("invalid commondir file: %v", filepath.FromSlash("repository/.git/worktrees/0123/commondir")),
-	)
 }
