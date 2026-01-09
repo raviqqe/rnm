@@ -36,7 +36,7 @@ func TestFileFinderFindFile(t *testing.T) {
 
 func TestFileFinderDoNotFindDirectory(t *testing.T) {
 	fs := memfs.New()
-	err := fs.MkdirAll("foo", 0o755)
+	err := fs.MkdirAll("foo", 0o700)
 	assert.Nil(t, err)
 
 	ss, err := newTestFileFinder(fs).Find(".", nil, nil, false)

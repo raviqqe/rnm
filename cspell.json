@@ -3,14 +3,21 @@
     "bradleyjkemp",
     "caml",
     "codecov",
+    "commondir",
     "cupaloy",
+    "dotgit",
     "fastmod",
+    "gitdir",
     "jessevdk",
+    "memfs",
     "nolint",
     "println",
     "raviqqe",
     "renamer",
+    "storer",
     "stretchr",
-    "struct"
+    "struct",
+    "worktree",
+    "worktrees"
   ]
 }

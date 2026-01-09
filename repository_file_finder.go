@@ -2,17 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
-	"regexp"
+	"strings"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/go-git/go-billy/v5/util"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
-
-var parentDirectoryRegexp = regexp.MustCompile(`^\.\./`)
 
 type repositoryFileFinder struct {
 	fileSystem billy.Filesystem
@@ -23,81 +22,131 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string) ([]string, error) {
-	wd, err := f.findWorktreeDirectory(d)
+	r, wd, err := f.openGitRepository(d)
 	if err != nil {
 		return nil, err
-	} else if wd == "" {
+	} else if r == nil {
 		return nil, nil
 	}
 
-	gfs, err := f.fileSystem.Chroot(f.fileSystem.Join(wd, ".git"))
-	if err != nil {
-		return nil, err
-	}
-
-	wfs, err := f.fileSystem.Chroot(wd)
-	if err != nil {
-		return nil, err
-	}
-
-	r, err := git.Open(
-		filesystem.NewStorage(gfs, cache.NewObjectLRUDefault()),
-		wfs,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	ref, err := r.Head()
-	if err != nil {
-		return nil, err
-	}
-
-	c, err := r.CommitObject(ref.Hash())
-	if err != nil {
-		return nil, err
-	}
-
-	i, err := c.Files()
+	i, err := r.Storer.Index()
 	if err != nil {
 		return nil, err
 	}
 
 	ps := []string{}
 
-	err = i.ForEach(func(file *object.File) error {
-		ps = append(ps, f.fileSystem.Join(wd, file.Name))
+	for _, e := range i.Entries {
+		p := f.fileSystem.Join(wd, e.Name)
 
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+		i, err := f.fileSystem.Lstat(p)
+		if err != nil {
+			return nil, err
+		} else if i.IsDir() {
+			// Directories are meaningful only if they contain files in Git repositories.
+			// Hence, file renaming handles directories implicitly.
+			continue
+		}
 
-	pps := make([]string, 0, len(ps))
-
-	for _, p := range ps {
 		b, err := filepath.Rel(d, p)
-		if err == nil && !parentDirectoryRegexp.MatchString(filepath.ToSlash(b)) {
-			pps = append(pps, p)
+
+		if err == nil && !strings.HasPrefix(filepath.ToSlash(b), "../") {
+			ps = append(ps, p)
 		}
 	}
 
-	return pps, nil
+	return ps, nil
 }
 
-func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, error) {
+func (f *repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
+	rd, i := f.findWorktreeDirectory(d)
+	if rd == "" {
+		return nil, "", nil
+	}
+
+	wd := filepath.Dir(rd)
+	wfs, err := f.fileSystem.Chroot(wd)
+	if err != nil {
+		return nil, "", err
+	}
+
+	if !i.IsDir() {
+		d, err := f.findWorktreeDataDirectory(rd)
+		if err != nil {
+			return nil, "", err
+		}
+
+		rd, err = f.findCommonDirectory(d)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
+	rfs, err := f.fileSystem.Chroot(rd)
+	if err != nil {
+		return nil, "", err
+	}
+
+	r, err := git.Open(
+		filesystem.NewStorage(rfs, cache.NewObjectLRUDefault()),
+		wfs,
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return r, wd, nil
+}
+
+func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileInfo) {
 	for {
 		p := f.fileSystem.Join(d, ".git")
-		i, err := f.fileSystem.Lstat(p)
-		if err == nil && i.IsDir() {
-			return d, nil
-		} else if err == nil && !i.IsDir() {
-			return "", fmt.Errorf("multiple worktrees not supported: %v", p)
+
+		if i, err := f.fileSystem.Lstat(p); err == nil {
+			return p, i
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
 			return "", nil
 		}
 
 		d = filepath.Dir(d)
 	}
+}
+
+func (f *repositoryFileFinder) findWorktreeDataDirectory(p string) (string, error) {
+	bs, err := util.ReadFile(f.fileSystem, p)
+	if err != nil {
+		return "", err
+	}
+
+	s := strings.Split(string(bs), "\n")[0]
+	const prefix = "gitdir:"
+
+	if !strings.HasPrefix(s, prefix) {
+		return "", fmt.Errorf("no gitdir entry in .git file: %v", p)
+	}
+
+	return f.resolvePath(filepath.Dir(p), strings.TrimSpace(s[len(prefix):])), nil
+}
+
+func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
+	p := f.fileSystem.Join(d, "commondir")
+	bs, err := util.ReadFile(f.fileSystem, p)
+	if err != nil {
+		return "", err
+	}
+
+	c := strings.TrimSpace(string(bs))
+	if c == "" {
+		return "", fmt.Errorf("invalid commondir file: %v", p)
+	}
+
+	return f.resolvePath(d, c), nil
+}
+
+func (f *repositoryFileFinder) resolvePath(d, p string) string {
+	if filepath.IsAbs(p) {
+		return p
+	}
+
+	return filepath.Clean(f.fileSystem.Join(d, p))
 }
