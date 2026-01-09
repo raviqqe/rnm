@@ -84,7 +84,12 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 	}
 
 	if !i.IsDir() {
-		rd, err = f.findCommonDirectory(rd)
+		d, err := f.findWorktreeDataDirectory(rd)
+		if err != nil {
+			return nil, "", err
+		}
+
+		rd, err = f.findCommonDirectory(d)
 		if err != nil {
 			return nil, "", err
 		}
