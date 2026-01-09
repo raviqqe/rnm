@@ -137,7 +137,7 @@ func (f *repositoryFileFinder) findWorktreeDataDirectory(p string) (string, erro
 		return "", fmt.Errorf("no gitdir entry in .git file: %v", p)
 	}
 
-	return strings.TrimSpace(s[len(prefix):]), nil
+	return f.resolvePath(filepath.Dir(p), strings.TrimSpace(s[len(prefix):])), nil
 }
 
 func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
@@ -147,14 +147,18 @@ func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
 		return "", err
 	}
 
-	cd := strings.TrimSpace(string(bs))
-	if cd == "" {
+	c := strings.TrimSpace(string(bs))
+	if c == "" {
 		return "", fmt.Errorf("empty commondir file: %v", p)
 	}
 
-	if filepath.IsAbs(cd) {
-		return cd, nil
+	return f.resolvePath(d, c), nil
+}
+
+func (f *repositoryFileFinder) resolvePath(d, p string) string {
+	if filepath.IsAbs(p) {
+		return p
 	}
 
-	return filepath.Clean(filepath.Join(d, cd)), nil
+	return filepath.Clean(f.fileSystem.Join(d, p))
 }

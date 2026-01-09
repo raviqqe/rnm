@@ -141,30 +141,30 @@ func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
 func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 	fs := memfs.New()
 
-	err := fs.MkdirAll("repo", 0o755)
+	err := fs.MkdirAll("repository", 0o755)
 	assert.Nil(t, err)
 
-	rfs, err := fs.Chroot("repo")
+	rfs, err := fs.Chroot("repository")
 	assert.Nil(t, err)
 	commitFiles(t, rfs, []string{"foo"})
 
 	err = fs.MkdirAll("worktree", 0o755)
 	assert.Nil(t, err)
 
-	err = fs.MkdirAll("repo/.git/worktrees/0123", 0o755)
+	err = fs.MkdirAll("repository/.git/worktrees/0123", 0o755)
 	assert.Nil(t, err)
 
 	err = util.WriteFile(
 		fs,
 		"worktree/.git",
-		[]byte("gitdir: ../repo/.git/worktrees/0123\n"),
+		[]byte("gitdir: ../repository/.git/worktrees/0123\n"),
 		0o444,
 	)
 	assert.Nil(t, err)
 
 	err = util.WriteFile(
 		fs,
-		"repo/.git/worktrees/0123/commondir",
+		"repository/.git/worktrees/0123/commondir",
 		[]byte("../..\n"),
 		0o444,
 	)
@@ -172,7 +172,7 @@ func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 
 	err = util.WriteFile(
 		fs,
-		"repo/.git/worktrees/0123/HEAD",
+		"repository/.git/worktrees/0123/HEAD",
 		[]byte("ref: refs/heads/master\n"),
 		0o444,
 	)
