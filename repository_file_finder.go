@@ -44,16 +44,16 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
-	repositoryFs := billy.Filesystem(rfs)
+	rfs = billy.Filesystem(rfs)
 	commonFs, err := f.findCommonGitDirectory(rd)
 	if err != nil {
 		return nil, err
 	} else if commonFs != nil {
-		repositoryFs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
+		rfs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
 	}
 
 	r, err := git.Open(
-		filesystem.NewStorage(repositoryFs, cache.NewObjectLRUDefault()),
+		filesystem.NewStorage(rfs, cache.NewObjectLRUDefault()),
 		wfs,
 	)
 	if err != nil {
@@ -129,16 +129,18 @@ func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDire
 
 	line := strings.Split(string(b), "\n")[0]
 	const prefix = "gitdir:"
+
 	if !strings.HasPrefix(line, prefix) {
 		return "", fmt.Errorf(".git file has no %s prefix: %v", prefix, dotGitPath)
 	}
 
-	gitDir := strings.TrimSpace(line[len(prefix):])
-	if filepath.IsAbs(gitDir) {
-		return filepath.Clean(gitDir), nil
+	d := strings.TrimSpace(line[len(prefix):])
+
+	if filepath.IsAbs(d) {
+		return filepath.Clean(d), nil
 	}
 
-	return filepath.Clean(filepath.Join(worktreeDirectory, gitDir)), nil
+	return filepath.Clean(filepath.Join(worktreeDirectory, d)), nil
 }
 
 func (f *repositoryFileFinder) findCommonGitDirectory(gitDir string) (billy.Filesystem, error) {
