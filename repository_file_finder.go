@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
-	"github.com/go-git/go-git/v5/storage/filesystem/dotgit"
 )
 
 var parentDirectoryRegexp = regexp.MustCompile(`^\.\./`)
@@ -141,7 +141,7 @@ func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileI
 		if i, err := f.fileSystem.Lstat(p); err == nil {
 			return p, i
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
-			return "", os.FileInfo{}
+			return "", nil
 		}
 
 		d = filepath.Dir(d)
