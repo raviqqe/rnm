@@ -165,14 +165,6 @@ func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
-	err = util.WriteFile(
-		fs,
-		"repository/.git/worktrees/0123/commondir",
-		[]byte("../..\n"),
-		0o400,
-	)
-	assert.Nil(t, err)
-
 	_, err = fs.Create("worktree/foo")
 	assert.Nil(t, err)
 
