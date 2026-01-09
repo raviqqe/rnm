@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/go-git/go-billy/v5"
@@ -181,6 +182,10 @@ func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 }
 
 func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
+
 	fs := memfs.New()
 
 	err := fs.MkdirAll("repository", 0o700)
