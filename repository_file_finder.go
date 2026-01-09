@@ -103,9 +103,7 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 
 func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
 	for {
-		_, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git"))
-
-		if err == nil {
+		if _, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git")); err == nil {
 			return d
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
 			return ""
