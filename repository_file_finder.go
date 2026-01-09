@@ -44,7 +44,6 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
-	rfs = billy.Filesystem(rfs)
 	commonFs, err := f.findCommonGitDirectory(rd)
 	if err != nil {
 		return nil, err
