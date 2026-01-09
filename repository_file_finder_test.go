@@ -200,7 +200,7 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithAbsoluteGitPaths(t *tes
 		fs,
 		"worktree/.git",
 		// An absolute `gitdir` path
-		fmt.Appendf(nil, "gitdir: %s\n", filepath.FromSlash("/repository/.git/worktrees/0123")),
+		fmt.Appendf(nil, "gitdir: %v\n", filepath.FromSlash("/repository/.git/worktrees/0123")),
 		0o400,
 	)
 	assert.Nil(t, err)
@@ -247,7 +247,7 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithInvalidGitdirEntry(t *t
 	assert.Nil(t, err)
 
 	_, err = newRepositoryFileFinder(fs).Find("worktree")
-	assert.EqualError(t, err, "no gitdir entry in .git file: worktree/.git")
+	assert.EqualError(t, err, fmt.Sprintf("no gitdir entry in .git file: %v", filepath.FromSlash("worktree/.git")))
 }
 
 func TestRepositoryFileFinderFindPathInLinkedWorktreeWithNoCommonDirectoryFile(t *testing.T) {
@@ -311,5 +311,9 @@ func TestRepositoryFileFinderFindPathInLinkedWorktreeWithInvalidCommonDirectoryF
 	assert.Nil(t, err)
 
 	_, err = newRepositoryFileFinder(fs).Find("worktree")
-	assert.EqualError(t, err, "invalid commondir file: repository/.git/worktrees/0123/commondir")
+	assert.EqualError(
+		t,
+		err,
+		fmt.Sprintf("invalid commondir file: %v", filepath.FromSlash("repository/.git/worktrees/0123/commondir")),
+	)
 }
