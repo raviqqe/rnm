@@ -138,31 +138,50 @@ func TestRepositoryFileFinderFindPathInDirectory(t *testing.T) {
 	assert.Equal(t, []string{"foo/foo"}, normalizePaths(ss))
 }
 
-// TODO Support multiple worktrees of the same repositories.
-func TestRepositoryFileFinderFailToFindPathInDifferentWorktree(t *testing.T) {
+func TestRepositoryFileFinderFindPathInLinkedWorktree(t *testing.T) {
 	fs := memfs.New()
 
-	err := fs.MkdirAll("foo", 0o755)
+	err := fs.MkdirAll("repo", 0o755)
 	assert.Nil(t, err)
 
-	subfs, err := fs.Chroot("foo")
+	repoFS, err := fs.Chroot("repo")
 	assert.Nil(t, err)
-	commitFiles(t, subfs, nil)
+	commitFiles(t, repoFS, []string{"foo"})
 
-	err = fs.MkdirAll("bar", 0o755)
+	err = fs.MkdirAll("wt", 0o755)
+	assert.Nil(t, err)
+
+	err = fs.MkdirAll("repo/.git/worktrees/wt", 0o755)
 	assert.Nil(t, err)
 
 	err = util.WriteFile(
 		fs,
-		"bar/.git",
-		[]byte("gitdir: /foo/.git"),
+		"wt/.git",
+		[]byte("gitdir: ../repo/.git/worktrees/wt\n"),
 		0o444,
 	)
 	assert.Nil(t, err)
 
-	_, err = fs.Create("bar/foo")
+	err = util.WriteFile(
+		fs,
+		"repo/.git/worktrees/wt/commondir",
+		[]byte("../..\n"),
+		0o444,
+	)
 	assert.Nil(t, err)
 
-	_, err = newRepositoryFileFinder(fs).Find("bar")
-	assert.NotNil(t, err)
+	err = util.WriteFile(
+		fs,
+		"repo/.git/worktrees/wt/HEAD",
+		[]byte("ref: refs/heads/master\n"),
+		0o444,
+	)
+	assert.Nil(t, err)
+
+	_, err = fs.Create("wt/foo")
+	assert.Nil(t, err)
+
+	ss, err := newRepositoryFileFinder(fs).Find("wt")
+	assert.Nil(t, err)
+	assert.Equal(t, []string{"wt/foo"}, normalizePaths(ss))
 }

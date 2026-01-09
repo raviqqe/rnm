@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
+	"github.com/go-git/go-git/v5/storage/filesystem/dotgit"
 )
 
 var parentDirectoryRegexp = regexp.MustCompile(`^\.\./`)
@@ -23,14 +27,14 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string) ([]string, error) {
-	wd, err := f.findWorktreeDirectory(d)
+	wd, gitDir, err := f.findWorktreeDirectory(d)
 	if err != nil {
 		return nil, err
 	} else if wd == "" {
 		return nil, nil
 	}
 
-	gfs, err := f.fileSystem.Chroot(f.fileSystem.Join(wd, ".git"))
+	gfs, err := f.fileSystem.Chroot(gitDir)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +44,16 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 		return nil, err
 	}
 
+	repositoryFs := billy.Filesystem(gfs)
+	commonFs, err := f.findCommonGitDirectory(gitDir)
+	if err != nil {
+		return nil, err
+	} else if commonFs != nil {
+		repositoryFs = dotgit.NewRepositoryFilesystem(gfs, commonFs)
+	}
+
 	r, err := git.Open(
-		filesystem.NewStorage(gfs, cache.NewObjectLRUDefault()),
+		filesystem.NewStorage(repositoryFs, cache.NewObjectLRUDefault()),
 		wfs,
 	)
 	if err != nil {
@@ -86,18 +98,75 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 	return pps, nil
 }
 
-func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, error) {
+func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, string, error) {
 	for {
 		p := f.fileSystem.Join(d, ".git")
 		i, err := f.fileSystem.Lstat(p)
 		if err == nil && i.IsDir() {
-			return d, nil
+			return d, p, nil
 		} else if err == nil && !i.IsDir() {
-			return "", fmt.Errorf("multiple worktrees not supported: %v", p)
+			gitDir, err := f.readGitDirFromDotGitFile(p, d)
+			return d, gitDir, err
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
-			return "", nil
+			return "", "", nil
 		}
 
 		d = filepath.Dir(d)
 	}
+}
+
+func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDirectory string) (string, error) {
+	file, err := f.fileSystem.Open(dotGitPath)
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = file.Close() }()
+
+	b, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	line := strings.Split(string(b), "\n")[0]
+	const prefix = "gitdir:"
+	if !strings.HasPrefix(line, prefix) {
+		return "", fmt.Errorf(".git file has no %s prefix: %v", prefix, dotGitPath)
+	}
+
+	gitDir := strings.TrimSpace(line[len(prefix):])
+	if filepath.IsAbs(gitDir) {
+		return filepath.Clean(gitDir), nil
+	}
+
+	return filepath.Clean(filepath.Join(worktreeDirectory, gitDir)), nil
+}
+
+func (f *repositoryFileFinder) findCommonGitDirectory(gitDir string) (billy.Filesystem, error) {
+	file, err := f.fileSystem.Open(f.fileSystem.Join(gitDir, "commondir"))
+	if os.IsNotExist(err) {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+	defer func() { _ = file.Close() }()
+
+	b, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	p := strings.TrimSpace(string(b))
+	if p == "" {
+		return nil, nil
+	}
+
+	if !filepath.IsAbs(p) {
+		p = filepath.Clean(filepath.Join(gitDir, p))
+	}
+
+	if _, err := f.fileSystem.Stat(p); err != nil {
+		return nil, err
+	}
+
+	return f.fileSystem.Chroot(p)
 }

@@ -4,6 +4,7 @@
     "caml",
     "codecov",
     "cupaloy",
+    "dotgit",
     "fastmod",
     "jessevdk",
     "nolint",
@@ -11,6 +12,7 @@
     "raviqqe",
     "renamer",
     "stretchr",
-    "struct"
+    "struct",
+    "worktree"
   ]
 }
