@@ -27,34 +27,7 @@ func newRepositoryFileFinder(fs billy.Filesystem) *repositoryFileFinder {
 }
 
 func (f *repositoryFileFinder) Find(d string) ([]string, error) {
-	wd, rd, err := f.findWorktreeDirectory(d)
-	if err != nil {
-		return nil, err
-	} else if wd == "" {
-		return nil, nil
-	}
-
-	wfs, err := f.fileSystem.Chroot(wd)
-	if err != nil {
-		return nil, err
-	}
-
-	rfs, err := f.fileSystem.Chroot(rd)
-	if err != nil {
-		return nil, err
-	}
-
-	commonFs, err := f.findCommonGitDirectory(rd)
-	if err != nil {
-		return nil, err
-	} else if commonFs != nil {
-		rfs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
-	}
-
-	r, err := git.Open(
-		filesystem.NewStorage(rfs, cache.NewObjectLRUDefault()),
-		wfs,
-	)
+	r, wd, err := f.openGitRepository(d)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +68,37 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 	}
 
 	return pps, nil
+}
+
+func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
+	wd, rd, err := f.findWorktreeDirectory(d)
+	if err != nil {
+		return nil, err
+	} else if wd == "" {
+		return nil, nil
+	}
+
+	wfs, err := f.fileSystem.Chroot(wd)
+	if err != nil {
+		return nil, err
+	}
+
+	rfs, err := f.fileSystem.Chroot(rd)
+	if err != nil {
+		return nil, err
+	}
+
+	commonFs, err := f.findCommonGitDirectory(rd)
+	if err != nil {
+		return nil, err
+	} else if commonFs != nil {
+		rfs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
+	}
+
+	return git.Open(
+		filesystem.NewStorage(rfs, cache.NewObjectLRUDefault()),
+		wfs,
+	)
 }
 
 func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, string, error) {
@@ -142,14 +146,14 @@ func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDire
 	return filepath.Clean(filepath.Join(worktreeDirectory, d)), nil
 }
 
-func (f *repositoryFileFinder) findCommonGitDirectory(gitDir string) (billy.Filesystem, error) {
-	file, err := f.fileSystem.Open(f.fileSystem.Join(gitDir, "commondir"))
+func (f *repositoryFileFinder) findCommonGitDirectory(d string) (billy.Filesystem, error) {
+	file, err := f.fileSystem.Open(f.fileSystem.Join(d, "commondir"))
 	if os.IsNotExist(err) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
-	defer func() { _ = file.Close() }()
+	defer func() { file.Close() }()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
@@ -162,7 +166,7 @@ func (f *repositoryFileFinder) findCommonGitDirectory(gitDir string) (billy.File
 	}
 
 	if !filepath.IsAbs(p) {
-		p = filepath.Clean(filepath.Join(gitDir, p))
+		p = filepath.Clean(filepath.Join(d, p))
 	}
 
 	if _, err := f.fileSystem.Stat(p); err != nil {
