@@ -129,7 +129,7 @@ func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileI
 	}
 }
 
-func (f *repositoryFileFinder) findCommonDirectory(p string) (string, error) {
+func (f *repositoryFileFinder) findWorktreeDataDirectory(p string, i os.FileInfo) (string, error) {
 	bs, err := util.ReadFile(f.fileSystem, p)
 	if err != nil {
 		return "", err
@@ -142,7 +142,10 @@ func (f *repositoryFileFinder) findCommonDirectory(p string) (string, error) {
 		return "", fmt.Errorf(".git file has no %s prefix: %v", prefix, p)
 	}
 
-	d := strings.TrimSpace(s[len(prefix):])
+	return strings.TrimSpace(s[len(prefix):])
+}
+
+func (f *repositoryFileFinder) findCommonDirectory(d string) (string, error) {
 	p := f.fileSystem.Join(d, "commondir")
 	bs, err := util.ReadFile(f.fileSystem, p)
 	if err != nil {
