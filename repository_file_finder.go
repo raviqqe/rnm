@@ -78,6 +78,12 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 		return nil, "", nil
 	}
 
+	if ;f.fileSystem.Join(wd, ".git") .IsDir() {
+	rd, err := f.findRepositoryDirectory(wd)
+	if err != nil {
+		return nil, err
+	}
+
 	wfs, err := f.fileSystem.Chroot(wd)
 	if err != nil {
 		return nil, "", err
@@ -86,13 +92,6 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 	rfs, err := f.fileSystem.Chroot(rd)
 	if err != nil {
 		return nil, "", err
-	}
-
-	commonFs, err := f.findCommonGitDirectory(rd)
-	if err != nil {
-		return nil, err
-	} else if commonFs != nil {
-		rfs = dotgit.NewRepositoryFilesystem(rfs, commonFs)
 	}
 
 	return git.Open(
@@ -129,12 +128,14 @@ func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDire
 	return filepath.Clean(filepath.Join(worktreeDirectory, d)), nil
 }
 
-func (f *repositoryFileFinder) findWorktreeDirectory(d string) string {
+func (f *repositoryFileFinder) findWorktreeDirectory(d string) (string, os.FileInfo) {
 	for {
-		if _, err := f.fileSystem.Lstat(f.fileSystem.Join(d, ".git")); err == nil {
-			return d
+		p := f.fileSystem.Join(d, ".git")
+
+		if i, err := f.fileSystem.Lstat(p); err == nil {
+			return p, i
 		} else if err == billy.ErrCrossedBoundary || d == filepath.Dir(d) {
-			return ""
+			return "", os.FileInfo{}
 		}
 
 		d = filepath.Dir(d)
