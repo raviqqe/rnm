@@ -84,9 +84,9 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 	}
 
 	if !i.IsDir() {
-		rd, err := f.findRepositoryDirectory(rd)
+		rd, err = f.findCommonDirectory(rd)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	}
 
@@ -95,10 +95,15 @@ func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, stri
 		return nil, "", err
 	}
 
-	return git.Open(
+	r, err := git.Open(
 		filesystem.NewStorage(rfs, cache.NewObjectLRUDefault()),
 		wfs,
 	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return r, wfs.Root(), nil
 }
 
 func (f *repositoryFileFinder) readGitDirFromDotGitFile(dotGitPath, worktreeDirectory string) (string, error) {
