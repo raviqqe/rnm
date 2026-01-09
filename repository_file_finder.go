@@ -58,7 +58,7 @@ func (f *repositoryFileFinder) Find(d string) ([]string, error) {
 	return ps, nil
 }
 
-func (f repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
+func (f *repositoryFileFinder) openGitRepository(d string) (*git.Repository, string, error) {
 	rd, i := f.findWorktreeDirectory(d)
 	if rd == "" {
 		return nil, "", nil
