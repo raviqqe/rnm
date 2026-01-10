@@ -19,7 +19,7 @@ func commitFiles(t *testing.T, fs billy.Filesystem, paths []string) {
 	g, err := fs.Chroot(".git")
 	assert.Nil(t, err)
 
-	r, err := git.Init(filesystem.NewStorage(g, cache.NewObjectLRUDefault()))
+	r, err := git.Init(filesystem.NewStorage(g, cache.NewObjectLRUDefault()), git.WithWorkTree(fs))
 	assert.Nil(t, err)
 
 	w, err := r.Worktree()
