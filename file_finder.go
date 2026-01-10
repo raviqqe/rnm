@@ -3,7 +3,7 @@ package main
 import (
 	"regexp"
 
-	"github.com/go-git/go-billy/v5"
+	"github.com/go-git/go-billy/v6"
 )
 
 var hiddenPathRegexp = regexp.MustCompile(`^\.`)

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-git/go-billy/v5/osfs"
+	"github.com/go-git/go-billy/v6/osfs"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/mattn/go-colorable"
 )
