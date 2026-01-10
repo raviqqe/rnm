@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-git/go-billy/v5"
-	"github.com/go-git/go-billy/v5/util"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/storage/filesystem"
+	"github.com/go-git/go-billy/v6"
+	"github.com/go-git/go-billy/v6/util"
+	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing/cache"
+	"github.com/go-git/go-git/v6/storage/filesystem"
 )
 
 type repositoryFileFinder struct {
