@@ -1,4 +1,6 @@
 {
+  "ignorePaths": ["go.mod", "go.sum"],
+  "useGitignore": true,
   "words": [
     "bradleyjkemp",
     "caml",
