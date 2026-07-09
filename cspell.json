@@ -10,6 +10,7 @@
     "dotgit",
     "fastmod",
     "gitdir",
+    "gomod",
     "jessevdk",
     "memfs",
     "nolint",
