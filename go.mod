@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
-	github.com/go-git/go-billy/v6 v6.0.0-alpha.2
+	github.com/go-git/go-billy/v6 v6.0.0-beta.1
 	github.com/go-git/go-git/v6 v6.0.0-alpha.5
 	github.com/h2non/filetype v1.1.3
 	github.com/iancoleman/strcase v0.3.0
